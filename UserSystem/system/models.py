@@ -35,7 +35,7 @@ class GroupPermission(models.Model):
 
 class User(models.Model):
     '''Таблица пользователей'''
-    nick = models.CharField(max_length= 30, null=False, primary_key=True)
+    login = models.CharField(max_length= 30, null=False, primary_key=True)
     password = models.TextField(null=False)
     fname = models.CharField(max_length = 30)
     lname = models.CharField(max_length=30)
@@ -45,6 +45,31 @@ class User(models.Model):
     date_registration = models.DateField()
     data_visit = models.DateField()
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    def from_json(self, data):
+        '''
+        {
+            'login': <login>, - required
+            'pass': <password>, - required
+            'fname': <first_name>,
+            'lname': <last_name>,
+            'patronimyc': <patronimyc>,
+            'birth': [<day>, <month>, <year>],
+            'avatar': <image in base64>
+        }
+        '''
+        nick = data['login']
+        password = data['pass']
+        if 'fname' in data:
+            fname = data['fname']
+        if 'lname' in data:
+            lname = data['lname']
+        if 'patronimyc' in data:
+            patronymic = data['patronimyc']
+        if 'birth' in data:
+
+
+
+
 
 class UserSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

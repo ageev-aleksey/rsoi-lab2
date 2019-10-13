@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 import hashlib
 from . import models
-from . import JWT
+from . import token
 
 # Create your views here.
 def get_json(request):
@@ -15,22 +15,6 @@ def get_json(request):
 class JsonResponseRequestError(HttpResponse):
     def __init__(self):
         HttpResponse.__init__(self, "{'type': 'error', 'data': 'wrong request'}")
-
-@csrf_exempt
-def singup(request):
-    try:
-        if request.method == 'POST':
-            data = get_json(request)
-            response = JsonResponse(data)
-            print(hashlib.sha256(data))
-           # response.set_cookie('session', hashlib.sha256(data))
-            return response
-        else:
-            return JsonResponseRequestError()
-    except:
-        print("++ERROR++")
-        return JsonResponseRequestError()
-
 
 class Authorize:
     '''Авторизация пользователя:
@@ -43,7 +27,7 @@ class Authorize:
             Response:
             {
 	            type: "ok",
-	            token: "<JWT>"
+	            in cookie: token: "<RandomSignedToken>"
             }
              {
 	            type: "error",
@@ -56,6 +40,7 @@ class Authorize:
         if self.request.method == 'POST':
             self.data = json.dumps(request.body)
             self.response = {}
+            self.token = token.SignedToken("This is Super Secret Key!!")
     '''
     def createUser(self):
         if self._request.method == "POST":
@@ -63,7 +48,7 @@ class Authorize:
             user = models.User()
             '''
     def isAuthorize(self):
-        '''ПРоверка аторизованности выполнятеся с помощью JWT токена
+        '''ПРоверка аторизованности выполнятеся с помощью  токена
         JWT:
         |       header = {"alg": "HS256", "typ": "JWT" }
         |       payload = {"login": "login"}
@@ -71,10 +56,12 @@ class Authorize:
             JWT = token.HMAC-SH256(token, secret_key)
         '''
         try:
-            if JWT.testJWT(self.data['jwt']):
-                user_sess = models.UserSession.objects.filter(
-                    user = models.User.objects.filter(login = )
-                )
+            if self.token.random_token_test(self.data['token']):
+                user_sess = models.UserSession.objects.filter( token = self.data['token'].split('.'))
+                if len(user_sess) == 0:
+                    return False
+                else:
+                    return True
         except:
             return False
 
@@ -83,14 +70,33 @@ class Authorize:
         '''
         try:
             user = models.User.objects.filter(nikname = self.data['login'])
-            if (len(user) == 1) and (user[0].password == hashlib.sha256(data["pass"])):
-                self.response['token'] = JWT.createJWT()
+            if (len(user) == 1) and (user[0].password == hashlib.sha256(self.data["pass"])):
+                self.response['token'] = self.token.createJWT()
             else:
                 return False
         except:
             return False
 
 
+
+
+@csrf_exempt
+def singup(request):
+    try:
+        if request.method == 'POST':
+            data = get_json(request)
+            try:
+                user = models.User()
+                user.from_json(data)
+                user.group = models.Group.objects.filter(name = 'user')[0]
+                user.save()
+            except:
+                return JsonResponseRequestError()
+        else:
+            return JsonResponseRequestError()
+    except:
+        print("++ERROR++")
+        return JsonResponseRequestError()
 
 """Схема доступа к ресурсу сервиса:
 Пользователь запрашивает у Gate """
