@@ -39,13 +39,13 @@ class TokenCreator:
         JWT = token.HMAC-SH256(token, secret_key)
     '''
     def __init__(self, secret_key, hash = hashlib.sha256):
-        self.secret = secret_key
-        self.hash = hash
-    def __signature__(self, data):
+        self._secret = secret_key
+        self._hash = hash
+    def __calc_signature__(self, data):
         return hmac.new(
-                        key=self.secret.encode('utf-8'),
+                        key=self._secret.encode('utf-8'),
                         msg=data.encode('utf-8'),
-                        digestmod=self.hash
+                        digestmod=self._hash
                         ).hexdigest()
     '''def create_jwt(self, payload_data):
         if type(payload_data) == dict:
@@ -61,15 +61,21 @@ class TokenCreator:
             return token
         else:
             raise ValueError("Argument must have type a dict. Now type is a " + str(type(payload_data)))'''
-    def create_random_token(self, length):
+    def create_token(self, length):
         ptoken = ''.join([random.choice(string.ascii_lowercase + string.ascii_uppercase +
                                        string.digits) for i in range(length)])
-        return RandomToken(ptoken, self.__signature__(ptoken))
+        return RandomToken(ptoken, self.__calc_signature__(ptoken))
     def jwt_test(self, token):
         pass
     def random_token_test(self, token):
         if isinstance(token, RandomToken):
-            return token.signature() == self.__signature__(token.value())
+            print("=====")
+            print(token)
+            if token.signature() == self.__calc_signature__(token.value()):
+                print("TRUE")
+            else:
+                print("FALSE")
+            return token.signature() == self.__calc_signature__(token.value())
         else:
             raise ValueError("Argument token maust have type a RandomToken. Now type is " + str(type(token)))
     def random_token_from_data(self, data):
@@ -92,3 +98,5 @@ class RandomToken (Token):
         return self._signature
     def value(self):
         return self._value
+    def __str__(self):
+        return self._value + '.' + self._signature

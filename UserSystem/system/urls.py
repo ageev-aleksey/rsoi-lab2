@@ -17,5 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 urlpatterns = [
-    path('/singup', views.singup)
+    path("singin/", views.singin),
+    path('singup/', views.singup),
+    path('users/<int:page>/<int:page_len>', views.get_list_users),
+    path('users/<int:page>/', views.get_list_users),
+    path('users/', views.get_list_users),
+    path('check_permission/', views.check_permission2),
+    path('user/detail/', views.get_user_info)
 ]
