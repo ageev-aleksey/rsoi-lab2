@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 import datetime
+import hashlib
 
 # Create your models here.
 class Permission(models.Model):
@@ -45,7 +46,7 @@ class User(models.Model):
     birthday = models.DateField(null=True)
     date_registration = models.DateField(auto_now_add=True)
     date_visit = models.DateField()
-    uuid_avatar = models.UUIDField(default=uuid.uuid4, editable=True, unique=True, null=True)
+    uuid_avatar = models.UUIDField(editable=True, unique=False, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     def from_dict(self, data, in_group = 'user'):
         '''
@@ -59,9 +60,12 @@ class User(models.Model):
             'avatar': <uuid avatar from file service>
         }
         '''
+        print("*-----Model User from dict")
         self.date_registration = datetime.datetime.now()
+        print("*-----Model User from dict1")
         self.login = data['login']
-        self.password = data['pass']
+        print("*-----Model User from dict2")
+        self.password = hashlib.sha256(data['pass'].encode('utf8')).hexdigest()
         if 'fname' in data:
             self.fname = data['fname']
         if 'lname' in data:
@@ -74,28 +78,30 @@ class User(models.Model):
         if 'avatar' in data:
             self.uuid_avatar = data['avatar']
         self.date_visit = datetime.datetime.now()
+        print("*-----Model User from dict3")
         self.group = Group.objects.filter(name=in_group)[0]
+        print("*-----Model User from dict4")
     def to_dict(self):
         return {'login': self.login, 'fname': self.fname, 'lname': self.lname, 'patronymic': self.patronymic,
                 'group': self.group.name, 'birth': self.birthday, 'date_reg': self.date_registration.strftime("%Y-%m-%d %H:%M:%S") ,
                 'date_visit': self.date_visit.strftime("%Y-%m-%d %H:%M:%S"), 'uuid_avatar': str(self.uuid_avatar),'uuid': str(self.uuid)}
     def check_permission(self,uuid_service, uuid_object, need_permission):
         #проверим права супер-администратора
-        admin_service = Service.objects.filter(name = '*')
+        admin_service = Service.objects.filter(name='*')
         if len(admin_service) == 1:
-            admin_object = ServiceObject.objects.filter(service = admin_service, object_type = '*')
-            perm = UserPermission.objects.filter(user = self.login)
+            admin_object = ServiceObject.objects.filter(service = admin_service, object_type='*')
+            perm = UserPermission.objects.filter(user=self.login)
             print(perm)
             if len(perm) > 0:
                 return True
         #сначало проверяем личные права пользователя затем права по группе
-        serv_db = Service.objects.get(uuid = uuid_service)
+        serv_db = Service.objects.get(uuid=uuid.UUID(uuid_service))
         obj_db = ServiceObject.objects.get(service = serv_db, uuid = uuid_object)
-        res_perm = UserPermission.objects.filter(user = self, object =  obj_db, permission = need_permission)
+        res_perm = UserPermission.objects.filter(user=self.login, object=obj_db, permission=need_permission)
         if len(res_perm) == 1:
             return True
         #Проверяем права по группе
-        res_perm = GroupPermission.objects.filter(user=self, object=obj_db, permission=need_permission)
+        res_perm = GroupPermission.objects.filter(user=self.login, object=obj_db, permission=need_permission)
         if len(res_perm) == 1:
             return True
         else:

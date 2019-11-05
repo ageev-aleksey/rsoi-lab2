@@ -50,14 +50,17 @@ class Authorize:
             self.response = {}
             self.token = token.TokenCreator("This is Super Secret Key!!")
             self.user = None
+            print("*---- In authorize constructor")
 
     def createUser(self):
         self.user = models.User()
         print(self.data)
         print(type(self.data))
         self.user.from_dict(self.data)
+        print(models.User.objects.filter(login=self.data['login']))
         self.user.save(force_insert=True)
         self.user_authorize(self.user)
+        print("*---- createUser")
     def isAuthorize(self):
         '''ПРоверка аторизованности выполнятеся с помощью  токена
         JWT:
@@ -68,6 +71,7 @@ class Authorize:
         '''
         try:
             tok = self.data['token'].split('.')
+            print(tok)
             tok = token.RandomToken(tok[0], tok[1])
             print(tok)
             if self.token.random_token_test(tok):
@@ -166,13 +170,14 @@ def singup(request):
             auth = Authorize(request)
             auth.createUser()
             auth_token = auth.response['token'].value() + '.' + auth.response['token'].signature()
-        #  return JsonResponse(f'{{"type": "ok", "data": "user add in db", "token": "{auth_token}"}}')
-            return HttpResponse(f'{{"type": "ok", "data": "user add in db", "token": "{auth_token}"}}', content_type='application/json')
+            return JsonResponse({"type": "ok", "data": "user add in db", "token": auth_token, "user_uuid": auth.user.uuid})
         else:
             return JsonResponseRequestError()
-    except IntegrityError:
+    except IntegrityError as exp:
+        print(exp)
         return JsonResponseRequestError("user with this login already exists")
-    except:
+    except Exception as exp:
+        print(exp)
         return JsonResponseRequestError()
 
 
@@ -243,3 +248,6 @@ def get_user_info(request):
         auth = Authorize(request)
         if auth.isAuthorize():
             return JsonResponse(auth.user.to_dict())
+
+
+#TODO при авторизации все время выдается новый токен. Исправить этот недостаток по ip

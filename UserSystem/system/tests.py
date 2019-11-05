@@ -40,7 +40,7 @@ class view_test(TestCase):
         print("\n====\n")
         self.assertEquals(r, json.dumps(self.users_list).encode('utf8'))
 
-    def tets_registration_ne_user(self):
+    def test_registration_ne_user(self):
         c = Client()
         data = {
                 "login": "NewUser",

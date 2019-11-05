@@ -9,7 +9,4 @@ class Command(BaseCommand):
         parser.add_argument("--std_answers", type=int, default=3, help="standard deviations of normal distribution number"
                                                                        " answers for each questions.")
     def handle(self, *args, **options):
-
-
-
-
+        pass
