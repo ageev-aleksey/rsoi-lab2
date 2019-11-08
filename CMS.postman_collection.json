@@ -1,0 +1,368 @@
+{
+	"info": {
+		"_postman_id": "ceede6db-6e8c-447e-ad43-1a9a3d8922a4",
+		"name": "CMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "UserSystem",
+			"item": [
+				{
+					"name": "Get users list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registration new user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\": \"NewUser\",\n\t\"pass\": 5515,\n\t\"fname\": \"Алексей\",\n\t\"lname\": \"Агеев\",\n\t\"patronymic\": \"Владимирович\",\n\t\"birth\": \"21.08.1997\",\n\t\"avatar\": \"47a666d1-f503-4c13-bd13-689f06dd83a5\"\n\t\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/singup/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"singup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registration new user2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\": \"King\",\n\t\"pass\": \"65461654aef6d4as6fs6d5f4Z68465465ds4f654dS\",\n\t\"fname\": \"Владимир\",\n\t\"lname\": \"Путин\",\n\t\"patronymic\": \"Владимирович\"\n\t\"birth\": \"14.06.1946\",\n\t\"avatar\": \"c5a43904-1bcc-442b-a203-eec38c8224bc\"\n\t\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/singup/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"singup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Permission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"token\": \"BSomV2RRQmKiGCoibKgC.5ebdd2d022b83fba5fa8aa17084239cf1199c26355f1add0d7655f688618ce97\",\n\t\"service\": \"8d458c42-9bbd-4949-a93e-34b3a02d4545\",\n\t\"object\": \"cd60875d-5cb3-4d0e-92a6-61544017f80b\",\n\t\"permission\": \"read\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/check_permission/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"check_permission",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Singin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\": \"super-admin\",\n\t\"pass\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/singin/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"singin",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Questions",
+			"item": [
+				{
+					"name": "Get page of questions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Question add",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n                \"title\": \"Как сдать лабу 2?\",\r\n                \"text\": \"Я ничего не хочу делать, сделайте за меня бесплатно!\",\r\n                \"user\": \"2244f7c3-026b-4bdb-8525-c66733725552\",\r\n                \"tags\": [\"django\", \"python\"],\r\n                \"what\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions/add/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"add",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete question",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/8056de03-0b65-432c-9adb-36933d300a16",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"8056de03-0b65-432c-9adb-36933d300a16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail decribe question",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add answer to question",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/javascript",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Ну тут асе просто, надо построить лангранжиан и решить полученную систему, подставив решение, получаем квадратичную форму, требуется определить знакопостоянность квадратичной формы.\",\r\n    \"author\": \"c8d3c9c6-3d47-45bf-8911-84f4669bb9b4\",\r\n    \"files\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "javascript"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/answers/add/4c2ff68a-9367-46b8-a9b8-ddefc656862e/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"answers",
+								"add",
+								"4c2ff68a-9367-46b8-a9b8-ddefc656862e",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete question",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/answers/ca1f5147-beca-48ff-a018-55d32b7de144",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"answers",
+								"ca1f5147-beca-48ff-a018-55d32b7de144"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Files",
+			"item": [],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

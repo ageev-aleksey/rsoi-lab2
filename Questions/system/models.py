@@ -20,7 +20,7 @@ class Question(models.Model):
             raise KeyError("json don't containing field " + str(exp))
 
     def brief_to_dict(self):
-        answers = Answer.objects.filter(uuid=self.uuid)
+        answers = Answer.objects.filter(question=self)
         num_answers = len(answers)
         Tags = TagsForQuestions.objects.filter(question=self.uuid)
         tags_list = []

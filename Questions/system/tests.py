@@ -47,7 +47,6 @@ class view_test(TestCase):
                                                                     "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
                                                                     "tags": ["python", "django", "РСОИ"],
                                                                     "answers": 0,
-                                                                    "raiting": 0
                                                                 },
                                                                 {
                                                                     "uuid": uuid2,
@@ -55,7 +54,6 @@ class view_test(TestCase):
                                                                     "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
                                                                     "tags": [],
                                                                     "answers": 0,
-                                                                    "raiting": 0
                                                                 }
                                                             ]
                                             })
@@ -106,18 +104,19 @@ class view_test(TestCase):
             "files": ["925e9ec7-1721-49f2-bd7e-043dab044f0e"]
         }), content_type='application/json')
         uuid = json.loads(response.content)['uuid']
-        response = c.post(f"/api/v1/questions/{uuid}/answers/add/", {
+        response = c.post(f"/api/v1/questions/{uuid}/answers/add/", json.dumps({
                 "text": "Берешь и делаешь!",
                 "user": "2c010530-bc3b-47de-bbd6-9bd4db726517",
-                "files": ['0346039a-a667-44e1-a762-1a354156053d', "0346039a-a667-44e1-a762-1a354156053d",
+                "files": ['0346039a-a667-44e1-a762-1a354156053d',
                           "35dae4ea-f684-498c-88f6-4bd382180bde"]
-        })
+        }), content_type='application/json')
+        print(response.content)
         self.assertEquals(response.status_code, 201)
-        response = c.post(f"/api/v1/questions/{uuid}/answers/add/", {
+        response = c.post(f"/api/v1/questions/{uuid}/answers/add/", json.dumps({
                 "text": "Все просто. Зайди на следующий сайт, и ты там найдешь как делать. google.com",
                 "user": "925e9ec7-1721-49f2-bd7e-043dab044f0e",
                 "files": []
-        })
+        }), content_type='application/json')
         self.assertEquals(response.status_code, 201)
         response = c.get(f"/api/v1/questions/{uuid}/")
         self.assertEquals(response.status_code, 200)
@@ -145,4 +144,48 @@ class view_test(TestCase):
             "files": ["925e9ec7-1721-49f2-bd7e-043dab044f0e"]
         })
 
+    def test_delete_answer_with_error_uuid_question(self):
+        c = Client()
+        response = c.post("/api/v1/questions/add/", json.dumps({
+            "title": "Как делат тесты?",
+            "text": "детальное описание вопроса",
+            "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
+            "tags": ["python", "django", "РСОИ"],
+            "files": ["925e6ec7-1721-49f2-bd7e-043dab044f0e"]
+        }), content_type='application/json')
+        uuidq = json.loads(response.content)['uuid']
+        response = c.post(f"/api/v1/questions/{uuidq}/answers/add", json.dumps({
+            "text": "тут текст вопроса",
+            "user": "94597947-78fc-4f33-a7f4-21c11e6630e6",
+            "files": ["1fac3o6f-ba14-40bd-b2f3-6d45c9d54939"]
+        }), content_type='application/json')
+        print("++++++++++++++")
+        print(response.content)
+        print("++++++++++++++")
+        uuida = json.loads(response.content)['uuid']
+        response = c.delete(f"/api/v1/questions/{uuidq+'a'}/answers/{uuida}")
+        self.assertEquals(json.loads(response), {"type": "ok"})
+
+        def test_delete_answer(self):
+            c = Client()
+            response = c.post("/api/v1/questions/add/", json.dumps({
+                "title": "Как делат тесты?",
+                "text": "детальное описание вопроса",
+                "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
+                "tags": ["python", "django", "РСОИ"],
+                "files": ["925e9ec7-1721-49f2-bd7e-043dab044f0e"]
+            }), content_type='application/json')
+            uuidq = json.loads(response.content)['uuid']
+            response = c.post(f"/api/v1/questions/{uuidq}/answers/add", {
+                "text": "тут текст вопроса",
+                "user": "94597947-78fc-4f33-a7f4-21c11e6630e6",
+                "files": ["1fac3e6f-ba14-40bd-b2f3-6d45c9d54939"]
+            })
+            uuida = json.loads(response.content)['uuid']
+            response = c.delete(f"/api/v1/questions/{uuidq}/answers/{uuida}", json.dumps({
+                "text": "тут текст вопроса",
+                "user": "94597947-78fc-4f33-a7f4-21c11e6630e6",
+                "files": ["1fac3e6f-ba14-40bd-b2f3-6d45c9d54939"]
+            }))
+            self.assertEquals(json.loads(response), {"type": "ok"})
 #TODO добавить в ответ рэйтинг статьи.

@@ -45,7 +45,7 @@ def get_questions(request, page=1):
         return JsonResponseNoContent({"type": "error", "data": "result after apply this request does not containing data"})
     paginator = Paginator(data, per_page=10)
     if page < 0 or page > paginator.num_pages:
-        return JsonResponseBadRequest({"type": "error", "data": "page number exceed existing number of pages"})
+        return JsonResponseNotFound({"type": "error", "data": "page number exceed existing number of pages"})
     brief_list = []
     for el in paginator.page(page):
         brief_list.append(el.brief_to_dict())
@@ -56,7 +56,7 @@ def get_questions(request, page=1):
                          "questions": brief_list})
 
 
-
+@csrf_exempt
 def question(request, uuid):
     if request.method == "GET":
         return get_question_detail_and_answers(request, uuid)
@@ -89,7 +89,10 @@ def get_question_detail_and_answers(request, uuid):
            Error: Code 400 Bad request. Body:
                {"type": "error", "data": "<brief description error>"}
             Error: 405 method note alowed"""
-    uuid = UUID.UUID(uuid)
+    try:
+        uuid = UUID.UUID(uuid)
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "incorect uuid of question"})
     print(uuid)
     question = models.Question.objects.filter(uuid = uuid)
     if len(question) == 0:
@@ -145,7 +148,7 @@ def delete_question(request, uuid):
     except:
         return JsonResponseBadRequest({"type": "error", "data": "incorrect question identificator"})
     if len(question) == 0:
-        return JsonResponseNoContent({"type": "error", "data": "qustion with identificator not found"})
+        return JsonResponseNotFound({"type": "error", "data": "qustion with identificator not found"})
     question[0].delete()
     return JsonResponse({"type": "ok"})
 
@@ -177,16 +180,48 @@ def add_answer_to_question(request, uuid):
 
     try:
         if len(question) == 0:
-            return JsonResponseNoContent({"type": "error", "data": "qustion with identificator not found"})
+            return JsonResponseNotFound({"type": "error", "data": "qustion with identificator not found"})
         question = question[0]
         answer = models.Answer(question=question)
         answer.from_dict(data)
         answer.save()
         for fuuid in files_uuid:
             models.FilesForAnswer(answer=answer, file_uuid=fuuid).save()
-        return JsonResponse({"type": "ok", 'question':  question.uuid})
+        return JsonResponse({"type": "ok", 'uuid':  answer.uuid})
     except Exception as exp:
-        raise exp
+        return JsonResponseBadRequest({"type": "error", "data": str(exp)})
     return JsonResponseBadRequest({"type": "error"})
 
+
+@csrf_exempt
+def delete_answer(response,question_uuid, answer_uuid):
+    """ DELETE:
+        Response
+            -200:
+                {"type": "ok"}
+            -400:
+                {"type": "error", "data": "incorrect question identificator"}
+                {"type": "error", "data": "incorrect answer identificator"}
+            -404:
+                {"type": "error", "data": "incorrect question identificator"}
+
+
+    """
+
+    try:
+        question  = models.Question.objects.filter(uuid=UUID.UUID(question_uuid))
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect question identificator"})
+    if len(question) == 0:
+        return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})
+    try:
+        answer = models.Answer.objects.filter(uuid=UUID.UUID(answer_uuid))
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect answer identificator"})
+    if len(answer) == 0:
+        return JsonResponseNotFound({"type": "error", "data": "answer with uuid not found"})
+    if answer[0].question != question[0]:
+        return JsonResponseBadRequest({"type": "error", "data": "uuid of answer not match uuid of question"})
+    answer.delete()
+    return JsonResponse({"type": "ok"})
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
