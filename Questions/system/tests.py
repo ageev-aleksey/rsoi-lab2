@@ -71,29 +71,6 @@ class view_test(TestCase):
         response = c.get("/api/v1/questions/1/")
         self.assertEquals(json.loads(response.content), {"type": "error", "data": "result after apply this request does not containing data"})
 
-    def test_get_question_detail(self):
-        c = Client()
-        response = c.post("/api/v1/questions/add/", json.dumps({
-            "title": "Как делат тесты?",
-            "text": "детальное описание вопроса",
-            "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
-            "tags": ["python", "django", "РСОИ"],
-            "files": []
-        }), content_type='application/json')
-        self.assertEquals(response.status_code, 201)
-        uuid = json.loads(response.content)["uuid"]
-        response = c.get(f"/api/v1/questions/{uuid}/")
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(json.loads(response.content), {
-            "uuid": uuid,
-            "title": "Как делат тесты?",
-            "text": "детальное описание вопроса",
-            "user": "2c080530-bc3b-47de-bbd6-9bd4db726517",
-            "tags": ["python", "django", "РСОИ"],
-            "answers": [],
-            "files": []
-        })
-
     def test_add_get_answers(self):
         c = Client()
         response = c.post("/api/v1/questions/add/", json.dumps({
