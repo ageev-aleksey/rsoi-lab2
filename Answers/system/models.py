@@ -1,10 +1,11 @@
 from django.db import models
 import datetime
+import uuid as UUID
 
 # Create your models here.
 class Answer(models.Model):
-    uuid = models.UUIDField(primary_key= True)
-    question_uuid = models.UUIDField(null = False, unique=False)
+    uuid = models.UUIDField(default=UUID.uuid4, unique=True)
+    question_uuid = models.UUIDField(null=False, unique=False)
     text = models.TextField()
     author = models.CharField(max_length=50, unique=False)
     date = models.DateField(default=datetime.datetime.now)
@@ -18,7 +19,7 @@ class Answer(models.Model):
     def from_dict(self, data):
         try:
             self.text = data['text']
-            self.author = data['user']
+            self.author = data['author']
             self.question_uuid = data['question']
         except KeyError as exp:
             raise KeyError("json don't containing field " + str(exp))
