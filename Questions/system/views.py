@@ -225,3 +225,4 @@ def delete_answer(response,question_uuid, answer_uuid):
     answer.delete()
     return JsonResponse({"type": "ok"})
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
+#TODO для 4 лабы использовать redis
