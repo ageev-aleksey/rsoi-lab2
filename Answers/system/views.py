@@ -113,8 +113,9 @@ def get_or_del_answer(request, uuid):
         return get_answer(request, uuid)
     if request.method == "DELETE":
         return delete_answer(request, uuid)
-    return JsonResponseMethodNotAllowed(["GET", "DELETE"], {"type": "error", "data":
-                    "this url path not allowed method is " + request.method})
+    return JsonResponseMethodNotAllowed({"type": "error",
+                                         "data": "this url path not allowed method is " + request.method},
+                                        ["GET", "DELETE"])
 
 @csrf_exempt
 def get_answers_page(request):
@@ -193,3 +194,32 @@ def delete_answer(response,answer_uuid):
         return JsonResponseNotFound({"type": "error", "data": "answer with uuid not found"})
     answer.delete()
     return JsonResponse({"type": "ok"})
+
+@csrf_exempt
+def count_answers(request):
+    try:
+        question_uuid = UUID.UUID(request.GET['question'])
+    except KeyError:
+        return JsonResponseBadRequest({"type": "error","data": "you must send get parameter a 'question'"})
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "get parameter a 'question' must have type UUID4"})
+    answers = models.Answer.objects.filter(question_uuid=question_uuid)
+    return JsonResponse({"type": "ok", "count": answers.count()})
+
+@csrf_exempt
+@require_GET
+def count_answers_for_list_questions(request):
+    try:
+        data = json.loads(request.body)
+    except json.decoder.JSONDecodeError:
+        return JsonResponseBadRequest({"type": "error", "data": "body of query must have containing json object"})
+    try:
+        res = {"type": "count_answers_list", "count": []}
+        for quuid in data['questions']:
+            res['count'].append(models.Answer.objects.filter(question_uuid=UUID.UUID(quuid)).count())
+    except KeyError:
+        return JsonResponseBadRequest({"type": "error", "data": "json must have a field 'questions'"})
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "get parameter a 'question' must have type UUID4"})
+    return JsonResponse(res)
+

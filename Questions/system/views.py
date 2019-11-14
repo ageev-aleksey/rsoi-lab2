@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.paginator import Paginator
 import uuid as UUID
+import logging
 import json
 from . import models
 
@@ -21,7 +22,7 @@ class JsonResponseCreated(JsonResponse):
 
 @require_GET
 @csrf_exempt
-def get_questions(request, page=1):
+def get_questions(request):
     """GET
     Response:
         Correct:  Code 200 Ok. Body:
@@ -40,8 +41,15 @@ def get_questions(request, page=1):
             }
         Error: Code 400 Bad request. Body:
             {"type": "error", "data": "<brief description error>"}"""
+    log = logging.getLogger("questions.get_questions")
+    log.setLevel(logging.DEBUG)
+    log.info("Get questions list")
+    try:
+        page = int(request.GET['page'])
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "error get parameters"})
     data = models.Question.objects.all()
-    if len(data) == 0:
+    if data.count() == 0:
         return JsonResponseNoContent({"type": "error", "data": "result after apply this request does not containing data"})
     paginator = Paginator(data, per_page=10)
     if page < 0 or page > paginator.num_pages:
@@ -115,7 +123,9 @@ def add_question(request):
             201 Created
             405 method note alowed
     """
-
+    log = logging.getLogger("questions.add_question")
+    log.setLevel(logging.DEBUG)
+    log.info("add question")
     try:
         data = json.loads(request.body)
     except Exception as exp:

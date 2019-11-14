@@ -10,11 +10,16 @@ class Answer(models.Model):
     author = models.CharField(max_length=50, unique=False)
     date = models.DateField(default=datetime.datetime.now)
     def to_dict(self):
+        files = FilesForAnswer.objects.filter(answer=self.id)
+        flist = []
+        for f in files:
+            flist.append(str(f.file_uuid))
         return {
             'uuid': self.uuid,
             'question': self.question_uuid,
             'text': self.text,
             'author': self.author,
+            'files': flist,
         }
     def from_dict(self, data):
         try:
