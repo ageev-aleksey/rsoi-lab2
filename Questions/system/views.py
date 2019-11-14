@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.paginator import Paginator
 import uuid as UUID
+import logging
 import json
 from . import models
 
@@ -21,7 +22,7 @@ class JsonResponseCreated(JsonResponse):
 
 @require_GET
 @csrf_exempt
-def get_questions(request, page=1):
+def get_questions(request):
     """GET
     Response:
         Correct:  Code 200 Ok. Body:
@@ -40,8 +41,15 @@ def get_questions(request, page=1):
             }
         Error: Code 400 Bad request. Body:
             {"type": "error", "data": "<brief description error>"}"""
+    log = logging.getLogger("questions.get_questions")
+    log.setLevel(logging.DEBUG)
+    log.info("Get questions list")
+    try:
+        page = int(request.GET['page'])
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "error get parameters"})
     data = models.Question.objects.all()
-    if len(data) == 0:
+    if data.count() == 0:
         return JsonResponseNoContent({"type": "error", "data": "result after apply this request does not containing data"})
     paginator = Paginator(data, per_page=10)
     if page < 0 or page > paginator.num_pages:
@@ -64,7 +72,7 @@ def question(request, uuid):
         return delete_question(request, uuid)
 
 @csrf_exempt
-def get_question_detail_and_answers(request, uuid):
+def get_question_detail_and_answers(request, uuid):#todo переделать, так как остутсвует ответы, ответы переехали на другой сервис
     """GET
        Response:
            Correct:  Code 200 Ok. Body:
@@ -115,7 +123,9 @@ def add_question(request):
             201 Created
             405 method note alowed
     """
-
+    log = logging.getLogger("questions.add_question")
+    log.setLevel(logging.DEBUG)
+    log.info("add question")
     try:
         data = json.loads(request.body)
     except Exception as exp:
@@ -152,77 +162,6 @@ def delete_question(request, uuid):
     question[0].delete()
     return JsonResponse({"type": "ok"})
 
-@require_POST
-@csrf_exempt
-def add_answer_to_question(request, uuid):
-    """ POST
-        Request Body:
-        {
-            "text": "<text answer>",
-            "user": "<uuid author of answer>",
-            "files": [<uuid files>...]
-        }
-    """
-    try:
-        data = json.loads(request.body)
-    except:
-        return JsonResponseBadRequest({"type": "error", "data": "You must send body in json format"})
-   # проверка всех uuid
-    try:
-        user_uuid = UUID.UUID(uuid)
-        files_uuid = []
-        for f in data["files"]:
-            files_uuid.append(UUID.UUID(f))
-    except:
-        return JsonResponseBadRequest({"type": "error", "data": "incorrect object identificator"})
 
-    question = models.Question.objects.filter(uuid=user_uuid)
-
-    try:
-        if len(question) == 0:
-            return JsonResponseNotFound({"type": "error", "data": "qustion with identificator not found"})
-        question = question[0]
-        answer = models.Answer(question=question)
-        answer.from_dict(data)
-        answer.save()
-        for fuuid in files_uuid:
-            models.FilesForAnswer(answer=answer, file_uuid=fuuid).save()
-        return JsonResponse({"type": "ok", 'uuid':  answer.uuid})
-    except Exception as exp:
-        return JsonResponseBadRequest({"type": "error", "data": str(exp)})
-    return JsonResponseBadRequest({"type": "error"})
-
-
-@csrf_exempt
-def delete_answer(response,question_uuid, answer_uuid):
-    """ DELETE:
-        Response
-            -200:
-                {"type": "ok"}
-            -400:
-                {"type": "error", "data": "incorrect question identificator"}
-                {"type": "error", "data": "incorrect answer identificator"}
-            -404:
-                {"type": "error", "data": "incorrect question identificator"}
-
-
-    """
-
-    try:
-        question  = models.Question.objects.filter(uuid=UUID.UUID(question_uuid))
-    except:
-        return JsonResponseBadRequest({"type": "error", "data": "incorrect question identificator"})
-    if len(question) == 0:
-        return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})
-    try:
-        answer = models.Answer.objects.filter(uuid=UUID.UUID(answer_uuid))
-    except:
-        return JsonResponseBadRequest({"type": "error", "data": "incorrect answer identificator"})
-    if len(answer) == 0:
-        return JsonResponseNotFound({"type": "error", "data": "answer with uuid not found"})
-    if answer[0].question != question[0]:
-        return JsonResponseBadRequest({"type": "error", "data": "uuid of answer not match uuid of question"})
-    answer.delete()
-    return JsonResponse({"type": "ok"})
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
 #TODO для 4 лабы использовать redis

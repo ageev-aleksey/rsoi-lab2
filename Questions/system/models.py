@@ -20,8 +20,6 @@ class Question(models.Model):
             raise KeyError("json don't containing field " + str(exp))
 
     def brief_to_dict(self):
-        answers = Answer.objects.filter(question=self)
-        num_answers = len(answers)
         Tags = TagsForQuestions.objects.filter(question=self.uuid)
         tags_list = []
         for t in Tags:
@@ -30,7 +28,7 @@ class Question(models.Model):
                 "title": self.title,
                 "user": self.user_uuid,
                 "tags": tags_list,
-                "answers": num_answers}
+                }
 
     def detail_to_dict(self):
         answers = Answer.objects.filter(question=self.uuid)
@@ -61,25 +59,7 @@ class Question(models.Model):
                 "tags": tags_list,
                 "answers": answers_list}
 
-class Answer(models.Model):
-    uuid = models.UUIDField(default=uuid4, primary_key= True)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.TextField()
-    author_uuid = models.UUIDField(default=uuid4, unique=False, editable=True)
 
-    def to_dict(self):
-        return {
-            'uuid': self.uuid,
-            'question': self.question.uuid,
-            'text': self.text,
-            'user': self.author_uuid,
-        }
-    def from_dict(self, data):
-        try:
-            self.text = data['text']
-            self.author_uuid = data['user']
-        except KeyError as exp:
-            raise KeyError("json don't containing field " + str(exp))
 
 class FilesForQuestion(models.Model):
     class Meta:
@@ -88,11 +68,7 @@ class FilesForQuestion(models.Model):
     file_uuid = models.UUIDField(default=uuid4, editable=True)
 
 
-class FilesForAnswer(models.Model):
-    class Meta:
-        unique_together = (('answer', 'file_uuid'),)
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    file_uuid = models.UUIDField(default=uuid4, editable=True)
+
 
 class Tag(models.Model):
     tag = models.CharField(max_length=30, primary_key=True)
