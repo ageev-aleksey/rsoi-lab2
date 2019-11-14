@@ -17,7 +17,7 @@ class JsonResponseCreated(JsonResponse):
 class JsonResponseServerError(JsonResponse):
     status_code = 500
 
-def connect(service_path,method, timeout=0.001,**kwargs):
+def connect(service_path,method, timeout=5, data = None, params = None):
     log = logging.getLogger('GetWay.connect')
     log.setLevel(logging.DEBUG)
     if method == "POST":
@@ -31,7 +31,7 @@ def connect(service_path,method, timeout=0.001,**kwargs):
     counter = 0
     while(counter != 2):
         try:
-            r = con(service_path, timeout=timeout, **kwargs)
+            r = con(service_path, timeout=timeout, params=params, data=data)
             break
         except requests.exceptions.Timeout as exp:
             log.exception("connection timeout")
@@ -54,15 +54,30 @@ def get_questions_page(request):
     except ValueError:
         return JsonResponseBadRequest({"type": "error", "data": "query parameter 'get' mast have type int"})
     try:
-        rquestions = connect(service_config.question_system["questions_list"], "GET", params={"page": page}).json()
+        rquestions = connect(service_config.question_system["questions_list"], "GET", params={"page": page})
     except ConnectionError:
         return JsonResponseServerError({"type": "error", "data": "Unable to get a list of questions"})
     if rquestions.status_code == 200:
         try:
+            data = rquestions.json()
             rcount_answers = connect(service_config.answer_system["count_answers_question"],
-                                     "GET", data=rquestions["questions"]).json()
+                                     "GET", data=data["questions"])
+            print(rcount_answers.status_code)
+            if rcount_answers.status_code == 200:
+                count = data["count"]
+                res = {"type": "questions_paginate", "page": page, "pages": rquestions["pages"],
+                       "questions": []}
+                for q in range(len(data["questions"])):
+                    res["questions"].append(data["questions"][q])
+                    res["questions"][-1]["answers"] = count[q]
+                return JsonResponse(res)
+
+
+
+
         except Exception as exp:
             log.exception("Error, get count answers of question. " + str(exp))
-    else:
-        pass
+    elif rquestions.status_code == 203:
+        return JsonResponseNotFound({"type": "ok", "data": "answers not found"})
+    return JsonResponse({"type": "ok"})
 

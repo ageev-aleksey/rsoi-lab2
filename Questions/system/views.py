@@ -48,7 +48,7 @@ def get_questions(request):
         page = int(request.GET['page'])
     except:
         return JsonResponseBadRequest({"type": "error", "data": "error get parameters"})
-    data = models.Question.objects.all()
+    data = models.Question.objects.all() #todo добавить сортировку по дате добавления вопроса.
     if data.count() == 0:
         return JsonResponseNoContent({"type": "error", "data": "result after apply this request does not containing data"})
     paginator = Paginator(data, per_page=10)
