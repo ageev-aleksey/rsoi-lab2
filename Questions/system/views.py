@@ -76,23 +76,13 @@ def get_question_detail_and_answers(request, uuid):#todo переделать, �
     """GET
        Response:
            Correct:  Code 200 Ok. Body:
-               {"type": "question_detail_and_answers_pagination,
-               "page": "<page number>", "pages": "<number of pages>",
-               "question": {
-                                   "title": "<title>",
-                                   "text": "<detail describe>",
-                                   "user": "<author_uuid>",
-                                   "rating": "<integer number>"
-                            },
-                "answers": [
-                                {
-                                    "text": "<detail describe>",
-                                    "user": "<author_uuid>",
-                                    "rating": "<integer number>"
-                                    "isCorrect": "<True or False>"
-                                }
-                            ]
-
+               {
+                "uuid": "<question_uuid>",
+                "title": "<question_title>",
+                "text": "<question_text>",
+                "user": <user_name>,
+                "files": [<files_uuid>],
+                "tags": [<tags>]
                }
            Error: Code 400 Bad request. Body:
                {"type": "error", "data": "<brief description error>"}
@@ -118,7 +108,7 @@ def add_question(request):
                 "text": "<detail describe question>",
                 "user": "<user_uuid>",
                 "tags": [<list of tags>...]
-            }
+                "files": [<list of files_uuid>...]
         Response:
             201 Created
             405 method note alowed
@@ -131,7 +121,7 @@ def add_question(request):
     except Exception as exp:
         return JsonResponseBadRequest({"type": "error", "data": "You must send body in json format"})
     # Проверка того, что все поля существуют
-    for key in ["title", "text", "user", "tags"]:
+    for key in ["title", "text", "user", "tags", "files"]:
         if key not in list(data.keys()):
             return  JsonResponseBadRequest({"type": "error", "data": "You must have key: " + key })
     question = models.Question()
@@ -140,6 +130,12 @@ def add_question(request):
     except Exception as exp:
         return JsonResponseBadRequest({"type": "error", "data": str(exp)})
     question.save(force_insert=True)
+    try:
+        for fuuid in data['files']:
+            f = models.FilesForQuestion(question=question, file_uuid=UUID.UUID(fuuid))
+            f.save()
+    except ValueError as exp:
+        raise ValueError("incorrect file uuid")
     for t in data['tags']:
         tag = models.Tag.objects.filter(tag=t)
         if len(tag) == 0:

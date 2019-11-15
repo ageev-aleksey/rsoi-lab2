@@ -118,6 +118,7 @@ def get_or_del_answer(request, uuid):
                                         ["GET", "DELETE"])
 
 @csrf_exempt
+@require_GET
 def get_answers_page(request):
     """Request
     {
@@ -145,8 +146,8 @@ def get_answers_page(request):
     except ObjectDoesNotExist as exp:
         data_response["errors"].append(str(exp))
         i = 1 + 1
-    except KeyError:
-        return JsonResponseBadRequest({"type": "error", "data": "Json must have containing fild 'uuid'"})
+    except KeyError as exp:
+        return JsonResponseBadRequest({"type": "error", "data": str(exp)})
     return JsonResponse(data_response)
 
 

@@ -5,4 +5,4 @@ from . import models
 class UploadFileForms(ModelForm):
     class Meta:
         model = models.FileInfo
-        fields = ["file_name", "user"]
+        fields = ["file_name"]

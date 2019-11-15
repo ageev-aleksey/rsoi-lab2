@@ -22,13 +22,11 @@ def file_hash(file):
 class FileInfo(models.Model):
     file_name = models.CharField(max_length=50)
     date = models.DateField(default=datetime.datetime.now)
-    user = models.UUIDField(editable=True, unique=False)
     uuid = models.UUIDField(default=UUID.uuid4, unique=True, editable=True, primary_key=True)
     file = models.ForeignKey(FileContainer, unique=False, null=False, on_delete=models.CASCADE)
 
     def from_data(self, data, file):
         self.file_name = data['file_name']
-        self.user =  data['user']
         file.name = file_hash(file)
         try:
             new_file = FileContainer.objects.get(name=file.name)
@@ -43,5 +41,4 @@ class FileInfo(models.Model):
             "file_name": self.file_name,
             "file_size": self.file.file.size,
             "date": self.date,
-            "user": self.user
         }

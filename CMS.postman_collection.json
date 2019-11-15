@@ -207,7 +207,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n                \"title\": \"Как сдать лабу 2?\",\r\n                \"text\": \"Я ничего не хочу делать, сделайте за меня бесплатно!\",\r\n                \"user\": \"2244f7c3-026b-4bdb-8525-c66733725552\",\r\n                \"tags\": [\"django\", \"python\"],\r\n                \"what\": 0\r\n}",
+							"raw": "{\r\n                \"title\": \"Зачем нужны MySql\",\r\n                \"text\": \"Зачем все это, если все можно хранить в виде файлов файловой системы.\",\r\n                \"user\": \"2244f7c3-026b-4bdb-8525-c66733725559\",\r\n                \"tags\": [\"SQL\"],\r\n                \"files\": [\"52be6a0a-a799-4103-91cc-7672cb79582e\", \"ad3278e0-a0a7-4e8b-925e-4236e0243c40\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -215,7 +215,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/add/",
+							"raw": "http://127.0.0.1:8001/api/v1/questions/add/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -223,8 +223,10 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8001",
 							"path": [
+								"api",
+								"v1",
 								"questions",
 								"add",
 								""
@@ -285,47 +287,6 @@
 					"response": []
 				},
 				{
-					"name": "add answer to question",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/javascript",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Ну тут асе просто, надо построить лангранжиан и решить полученную систему, подставив решение, получаем квадратичную форму, требуется определить знакопостоянность квадратичной формы.\",\r\n    \"author\": \"c8d3c9c6-3d47-45bf-8911-84f4669bb9b4\",\r\n    \"files\": []\r\n}",
-							"options": {
-								"raw": {
-									"language": "javascript"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/answers/add/4c2ff68a-9367-46b8-a9b8-ddefc656862e/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"answers",
-								"add",
-								"4c2ff68a-9367-46b8-a9b8-ddefc656862e",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "delete question",
 					"request": {
 						"auth": {
@@ -360,7 +321,359 @@
 		},
 		{
 			"name": "Files",
-			"item": [],
+			"item": [
+				{
+					"name": "add file",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/D:/Python/DJANGO/lab2-microservices-ageev-aleksey/.gitignore"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "javascript"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/form/api/v1/file/add",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"form",
+								"api",
+								"v1",
+								"file",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get file",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/form/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"form",
+								"api",
+								"v1",
+								"file",
+								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get file info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/info/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"file",
+								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								"info",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Answers",
+			"item": [
+				{
+					"name": "add answer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"11111111111111111111111111111111111111111111111111111111111111111111111111111111\",\r\n    \"author\": \"11111\",\r\n    \"question\": \"2fcc80f1-f579-4268-b6c5-43c27797eb03\",\r\n    \"files\": [\"2fcc80f1-f579-4268-b6c5-43c27797eb03\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/add/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"add",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get answers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers?page=2&question=2fcc80f1-f579-4268-b6c5-43c27797eb03",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "question",
+									"value": "2fcc80f1-f579-4268-b6c5-43c27797eb03"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete answer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/32491dda-714e-424d-9a90-6234a8f7cc6f",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"32491dda-714e-424d-9a90-6234a8f7cc6f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get one answer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/1284e985-d02f-40b5-8d5b-38895b4e4b03/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"1284e985-d02f-40b5-8d5b-38895b4e4b03",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count answers of question",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/count?question=uuid",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"count"
+							],
+							"query": [
+								{
+									"key": "question",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GateWay",
+			"item": [
+				{
+					"name": "gate questions page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions?page=1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Question detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions/1284e985-d02f-40b5-8d5b-38895b4e4b03/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"1284e985-d02f-40b5-8d5b-38895b4e4b03",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"protocolProfileBehavior": {}
 		}
 	],
