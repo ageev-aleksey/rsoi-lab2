@@ -7,6 +7,7 @@ import uuid as UUID
 import logging
 import json
 from . import models
+from . import forms
 
 require_DELETE = require_http_methods(["DELETE"])
 # Create your views here.
@@ -100,7 +101,7 @@ def get_question_detail_and_answers(request, uuid):#todo переделать, �
 #TODO сделать возможность добавление uuid файлов
 @require_POST
 @csrf_exempt
-def add_question(request):
+def add_question2(request):
     """Post
         Body Request:
             {
@@ -144,6 +145,43 @@ def add_question(request):
         else:
             tag = tag[0]
         models.TagsForQuestions(question=question, tag=tag).save()
+    return JsonResponseCreated({"type": "ok", "uuid": question.uuid})
+
+@require_POST
+@csrf_exempt
+def add_question(request):
+    """Post
+        Body Request:
+            {
+                "title": "<question title>",
+                "text": "<detail describe question>",
+                "user": "<user_uuid>",
+                "tags": [<list of tags>...]
+                "files": [<list of files_uuid>...]
+        Response:
+            201 Created
+            405 method note alowed
+            404 bad request
+    """
+    log = logging.getLogger("questions.add_question")
+    log.setLevel(logging.DEBUG)
+    log.info("add question")
+    try:
+        data = json.loads(request.body)
+    except Exception as exp:
+        return JsonResponseBadRequest({"type": "error", "data": "You must send body in json format"})
+    qdata = forms.Question(data)
+    if qdata.is_valid():
+        question = models.Question()
+        question.from_dict(qdata.cleaned_data)
+        question.save()
+        if "tags" in qdata.cleaned_data:
+            for tag in qdata.cleaned_data['tags']:
+                t = models.Tag(tag=tag)
+                t.save()
+                models.TagsForQuestions(tag=t, question=question).save()
+    else:
+        return JsonResponseBadRequest({"type": "error", "data": qdata.errors})
     return JsonResponseCreated({"type": "ok", "uuid": question.uuid})
 
 @require_DELETE

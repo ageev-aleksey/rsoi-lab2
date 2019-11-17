@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET
-from django.http import JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+from django.http import JsonResponse, HttpResponse
+from . import forms
 import logging
 import requests
 import json
@@ -163,3 +164,44 @@ def get_question(request, question_uuid):
             del ans["files"]
 
     return JsonResponse(res_response)
+
+@csrf_exempt
+@require_POST
+def create_question(request):
+    try:
+        data = json.loads(request.body)
+    except ValueError:
+        return JsonResponseBadRequest({"error": "body of request must be containing a json object"})
+    question_data = forms.Question(data)
+    if question_data.is_valid():
+        conn = connect(service_config.question_system['add_question'], "POST",
+                       data=json.dumps(question_data.cleaned_data))
+        try:
+            quuid = json.loads(conn.content)["uuid"]
+        except:
+            return JsonResponseServerError({"type": "error", "data": "internal server error"})
+        if conn.status_code == 201:
+            return JsonResponse({"type": "ok", "uuid": quuid })
+        else:
+            return HttpResponse(conn.content, status=500)
+
+@csrf_exempt
+@require_POST
+def create_answer(request, question_uuid):
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponseBadRequest({"error": "body of request must be containing a json object"})
+    data["question"] = question_uuid
+    adata = forms.Answer(data)
+    if adata.is_valid():
+        try:
+            adata.cleaned_data["question"] = str(adata.cleaned_data["question"])
+            adata.cleaned_data["files"] = []
+            conn = connect(service_config.answer_system['add_answer'], "POST",
+                           data=json.dumps(adata.cleaned_data))
+            ans_data = json.loads(conn.content)
+        except Exception as exp:
+            return JsonResponseServerError({"type": "error", "data": "internal server error"})
+        return JsonResponse(ans_data)
+    return JsonResponseBadRequest({"type": "error", "data": adata.errors})
