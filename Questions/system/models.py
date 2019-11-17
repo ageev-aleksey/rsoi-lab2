@@ -7,7 +7,7 @@ class Question(models.Model):
     title = models.CharField(max_length=50, unique=False)
     text = models.TextField()
     user = models.CharField(max_length=30, unique=False)
-    rating = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)#Убрать рейтинг
 
     def from_dict(self, d):
         try:
