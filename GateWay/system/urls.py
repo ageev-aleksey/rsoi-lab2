@@ -6,4 +6,5 @@ urlpatterns = [
     path("questions/add/", views.create_question),
     path("questions/<str:question_uuid>/", views.get_question),
     path("questions/<str:question_uuid>/answers/add/", views.create_answer),
+    path("questions/<str:quuid>/files/", views.attach_file_question),
 ]

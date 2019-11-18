@@ -33,3 +33,6 @@ class Answer(forms.Form):
     text = forms.CharField()
     author = forms.CharField(max_length=30)
     question = forms.UUIDField()
+
+class Attach(forms.Form):
+    file_name = forms.CharField(max_length=50)

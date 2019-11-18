@@ -38,3 +38,9 @@ class Question(forms.Form):
     user = forms.CharField(max_length=30)
     tags = ValuesList(my_validator=text_len_validator(30), required=False)
     files = ValuesList(my_validator=uuid_validator(), required=False)
+
+
+class Answer(forms.Form):
+    text = forms.Textarea()
+    question = forms.UUIDField()
+    author = forms.CharField(max_length=30)

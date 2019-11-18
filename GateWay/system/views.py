@@ -20,7 +20,10 @@ class JsonResponseCreated(JsonResponse):
 class JsonResponseServerError(JsonResponse):
     status_code = 500
 
-def connect(service_path,method, timeout=5, data = None, params = None):
+def file_unpack(file):
+    return {'file', file}
+
+def connect(service_path,method, timeout=5, data = None, params = None, files=None):
     log = logging.getLogger('GetWay.connect')
     log.setLevel(logging.DEBUG)
     if method == "POST":
@@ -34,7 +37,7 @@ def connect(service_path,method, timeout=5, data = None, params = None):
     counter = 0
     while(counter != 2):
         try:
-            r = con(service_path, timeout=timeout, params=params, data=data)
+            r = con(service_path, timeout=timeout, params=params, data=data, files=files)
             break
         except requests.exceptions.Timeout as exp:
             log.exception("connection timeout")
@@ -205,3 +208,23 @@ def create_answer(request, question_uuid):
             return JsonResponseServerError({"type": "error", "data": "internal server error"})
         return JsonResponse(ans_data)
     return JsonResponseBadRequest({"type": "error", "data": adata.errors})
+
+
+@csrf_exempt
+@require_POST
+def attach_file_question(request, quuid):
+    try:
+        js = json.loads(request.POST['info'])
+    except:
+        return JsonResponseBadRequest({"type": "error", "data": "request must containing in body json object"})
+    qdata = forms.Attach(js)
+    if qdata.is_valid():
+        try:
+            f = open("test.tx", 'r')
+            conn = connect(service_config.file_system["add_file"], "POST",
+                           files={"file": f})
+        except Exception as exp:
+            return JsonResponseServerError({"type": "error", "data": str(exp)})
+        if conn.status_code == 200:
+            return JsonResponse({"type": "ok"})
+    return JsonResponseBadRequest({"type": "error", "data": qdata.errors})

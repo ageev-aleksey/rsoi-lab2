@@ -20,6 +20,10 @@ class JsonResponseNoContent(JsonResponse):
 class JsonResponseCreated(JsonResponse):
     status_code = 201
 
+class JsonResponseServer(JsonResponse):
+    status_code = 500
+
+
 
 @require_GET
 @csrf_exempt
@@ -195,6 +199,9 @@ def delete_question(request, uuid):
         return JsonResponseNotFound({"type": "error", "data": "qustion with identificator not found"})
     question[0].delete()
     return JsonResponse({"type": "ok"})
+
+
+
 
 
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
