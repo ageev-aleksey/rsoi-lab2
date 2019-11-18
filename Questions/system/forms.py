@@ -44,3 +44,7 @@ class Answer(forms.Form):
     text = forms.Textarea()
     question = forms.UUIDField()
     author = forms.CharField(max_length=30)
+
+class AttachFile(forms.Form):
+    file = forms.UUIDField()
+    question = forms.UUIDField()

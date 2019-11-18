@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 import uuid as UUID
 import logging
 import json
@@ -20,7 +21,7 @@ class JsonResponseNoContent(JsonResponse):
 class JsonResponseCreated(JsonResponse):
     status_code = 201
 
-class JsonResponseServer(JsonResponse):
+class JsonResponseServerError(JsonResponse):
     status_code = 500
 
 
@@ -200,9 +201,35 @@ def delete_question(request, uuid):
     question[0].delete()
     return JsonResponse({"type": "ok"})
 
+@csrf_exempt
+@require_POST
+def attache_file(request, quuid, fuuid):
+    data = {'question': quuid, 'file': fuuid}
+    validator = forms.AttachFile(data)
+    if validator.is_valid():
+        try:
+            question = models.Question.objects.get(uuid=validator.cleaned_data['question'])
+        except ObjectDoesNotExist as exp:
+            return JsonResponseNotFound({'type': 'error', "data": "question with uuid not exists"})
+        try:
+            models.FilesForQuestion(question=question, file_uuid=validator.cleaned_data['file']).save(force_insert=True)
+        except Exception as exp:
+            return JsonResponseServerError({"type": "error", "data": str(exp)})
+        return JsonResponse({'type': 'ok'})
+    return JsonResponseBadRequest({'type': "error", "data": validator.errors})
 
-
-
+@csrf_exempt
+@require_GET
+def is_exist(request, quuid):
+    try:
+        quuid = UUID.UUID(quuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of question"})
+    try:
+        models.Question.objects.get(uuid=quuid)
+    except ObjectDoesNotExist:
+        return JsonResponseNotFound({'type': "ok", "data": "Object don't exist"})
+    return JsonResponse({'type': "ok", "data": "Object exist"})
 
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
 #TODO для 4 лабы использовать redis

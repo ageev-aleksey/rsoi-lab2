@@ -174,7 +174,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/questions/1",
+							"raw": "http://127.0.0.1:8001/api/v1/questions/1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -182,7 +182,7 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8001",
 							"path": [
 								"api",
 								"v1",
@@ -207,7 +207,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n                \"title\": \"Зачем нужны MySql\",\r\n                \"text\": \"Зачем все это, если все можно хранить в виде файлов файловой системы.\",\r\n                \"user\": \"2244f7c3-026b-4bdb-8525-c66733725559\",\r\n                \"tags\": [\"SQL\"],\r\n                \"files\": [\"52be6a0a-a799-4103-91cc-7672cb79582e\", \"ad3278e0-a0a7-4e8b-925e-4236e0243c40\"]\r\n}",
+							"raw": "{\r\n                \"title\": \"Каталог пет-проектов для JS и не только?\",\r\n                \"text\": \"Подскажите, пожалуйста, на GitHub репозиторий в котором описывались идеи для создания пет проектов от простого к сложному. Там было 3 уровня по проектов 20 каждого уровня примерно. Ещё там на каждом проекте описывался базовый функционал, а также расширенный по желанию. Было в закладках, да потом выяснилось что настройки не синхронизировались и с заменой OS потерял доступ к этому ресурсу, надо было на гитхабе клонировать в свой). Кто нибудь знает ссылку на этот репозиторий?\",\r\n                \"user\": \"Piratt14\",\r\n                \"tags\": [\"Javascript\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -266,7 +266,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/",
+							"raw": "http://127.0.0.1:8001/api/v1/questions/ebfb8eb6-9ca4-4a92-8708-2b5ea25bedc6/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -274,12 +274,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8001",
 							"path": [
 								"api",
 								"v1",
 								"questions",
-								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"ebfb8eb6-9ca4-4a92-8708-2b5ea25bedc6",
 								""
 							]
 						}
@@ -287,7 +287,7 @@
 					"response": []
 				},
 				{
-					"name": "delete question",
+					"name": "delete answer",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -311,6 +311,86 @@
 								"8cf85328-fcf9-411a-a4e0-f501373349f4",
 								"answers",
 								"ca1f5147-beca-48ff-a018-55d32b7de144"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/files/<uid_file>",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"files",
+								"<uid_file>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"files",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is Exists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/v1/questions/ebfb8eb6-9ca4-4a92-8708-1b5ea25bedc6/exist",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8001",
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"ebfb8eb6-9ca4-4a92-8708-1b5ea25bedc6",
+								"exist"
 							]
 						}
 					},
@@ -396,7 +476,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/form/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
+							"raw": "http://127.0.0.1:8003/api/v1/files/ea6f1c73-055f-4de3-88bb-e275d708a5f4/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -404,13 +484,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8003",
 							"path": [
-								"form",
 								"api",
 								"v1",
-								"file",
-								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								"files",
+								"ea6f1c73-055f-4de3-88bb-e275d708a5f4",
 								""
 							]
 						}
@@ -438,6 +517,33 @@
 								"file",
 								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
 								"info",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/form/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"form",
+								"api",
+								"v1",
+								"file",
+								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
 								""
 							]
 						}
@@ -614,6 +720,60 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "add file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"files",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/answers/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"files",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -655,7 +815,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/1284e985-d02f-40b5-8d5b-38895b4e4b03/",
+							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -666,8 +826,143 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"1284e985-d02f-40b5-8d5b-38895b4e4b03",
+								"d4ca5555-4278-4868-ad59-747e19bec098",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create question",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n                \"title\": \"Решите эту задачу\",\r\n                \"text\": \"Старинная математическая задача, в которой спрашивалось, как можно пройти по всем семи мостам Кёнигсберга, не проходя ни по одному из них дважды\",\r\n                \"user\": \"Алексей\",\r\n                \"tags\": [\"Графы\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "",
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create answer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Пишите одну - максимально отшлифованную игру, а все остальные - нет и указываете: что нужно ещё доделать до идеала и почему Вы это не сделали: т.е. именно честно так всё и перечисляете. Сначала указываете причину создания нешлифованного проекта:'Проект, показывающий моё %умение/skill%...'. И потом, пишите пункты (в readme.md), которые Вы бы сделали до идеала.Обязательно, после этих пунктов, приводите ссылку на проект с максимально отшлифованной игрой (чтобы могли сравнить слова с делом).\",\r\n    \"author\": \"xmoonlight\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/answers/add/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"d4ca5555-4278-4868-ad59-747e19bec098",
+								"answers",
+								"add",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach file to question",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/files/add",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"d4ca5555-4278-4868-ad59-747e19bec098",
+								"files",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach file to answer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "download file",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/files/uuid_file",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"files",
+								"uuid_file"
 							]
 						}
 					},

@@ -22,8 +22,8 @@ class JsonResponseServerError(JsonResponse):
 
 def file_unpack(file):
     return {'file', file}
-
-def connect(service_path,method, timeout=5, data = None, params = None, files=None):
+#data = None, params = None, files=None
+def connect(service_path,method, timeout=5, **kwargs):
     log = logging.getLogger('GetWay.connect')
     log.setLevel(logging.DEBUG)
     if method == "POST":
@@ -37,7 +37,8 @@ def connect(service_path,method, timeout=5, data = None, params = None, files=No
     counter = 0
     while(counter != 2):
         try:
-            r = con(service_path, timeout=timeout, params=params, data=data, files=files)
+            #params=params, data=data, files=files
+            r = con(service_path, timeout=timeout, **kwargs)
             break
         except requests.exceptions.Timeout as exp:
             log.exception("connection timeout")
@@ -212,6 +213,8 @@ def create_answer(request, question_uuid):
 
 @csrf_exempt
 @require_POST
+#TODO если файл был загружен на сервер, но прикрепление к вопросу произошло неудачно,
+# то необходимо выполнить откат (удаление файла)
 def attach_file_question(request, quuid):
     try:
         js = json.loads(request.POST['info'])
@@ -220,11 +223,24 @@ def attach_file_question(request, quuid):
     qdata = forms.Attach(js)
     if qdata.is_valid():
         try:
-            f = open("test.tx", 'r')
-            conn = connect(service_config.file_system["add_file"], "POST",
-                           files={"file": f})
+            conn = connect(service_config.question_system['is_exist'] % (quuid), "GET")
+            if conn.status_code == 200:
+                conn = connect(service_config.file_system["add_file"], "POST",
+                               files={"file": request.FILES['file']}, data={"info": json.dumps(js)})
+                if conn.status_code == 200:
+                    finfo = json.loads(conn.content)
+                    conn = connect(service_config.question_system['attache'] % (quuid, finfo['uuid']), "POST")
+                    if conn.status_code == 200:
+                        return JsonResponse({"type": "ok", 'file_info': finfo})
+                    else:
+                        return JsonResponseServerError({'type': "error", "data": json.loads(conn.content)})
+                else:
+                    return JsonResponseServerError({'type': "error", "data": json.loads(conn.content)})
+            else:
+                return JsonResponseNotFound({'type': "error", "data": "not found question this uuid"})
         except Exception as exp:
             return JsonResponseServerError({"type": "error", "data": str(exp)})
-        if conn.status_code == 200:
-            return JsonResponse({"type": "ok"})
+
+
+
     return JsonResponseBadRequest({"type": "error", "data": qdata.errors})
