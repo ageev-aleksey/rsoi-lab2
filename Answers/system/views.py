@@ -22,6 +22,8 @@ class JsonResponseMethodNotAllowed(JsonResponse):
     def __init__(self, permitted_methods, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
+class JsonResponseServerError(JsonResponse):
+    status_code = 500
 
 class JsonResponseNoContent(JsonResponse):
     status_code = 203
@@ -129,28 +131,29 @@ def get_answers_page(request):
    # except:
         #return JsonResponseBadRequest({"type": "error", "data": "You must send body in json format"})
     data_response = {"type": "answers_list_pagination", "page": 0, "pages": 0, "answers": []}
+    page = int(request.GET['page'])
     try:
-         paginator = Paginator(models.Answer.objects.filter(question_uuid=request.GET["question"]), 3)
+         paginator = Paginator(models.Answer.objects.filter(question_uuid=request.GET["question"]).order_by('date'), 3)
          try:
-             if int(request.GET['page']) > paginator.num_pages:
+             if page > paginator.num_pages:
                  return JsonResponseNotFound({"type": "error", "data": "this page for answer not exists"})
          except KeyError:
             return JsonResponseBadRequest({"type": "error", "data": "when accessing the resource, you must pass "
                                                                     "a get parametrs for page"})
          except Exception as exp:
              return JsonResponseBadRequest({"type": "error", "data": "get paramet 'page' incorrect: " + str(exp) })
-         for answr in paginator.page(request.GET['page']):
+         for answr in paginator.page(page):
              data_response["answers"].append(answr.to_dict())
-         data_response["page"] = request.GET['page']
+         data_response["page"] = page
          data_response["pages"] = paginator.num_pages
     except ObjectDoesNotExist as exp:
         data_response["errors"].append(str(exp))
-        i = 1 + 1
     except KeyError as exp:
         return JsonResponseBadRequest({"type": "error", "data": str(exp)})
     return JsonResponse(data_response)
 
-
+@require_GET
+@csrf_exempt
 def get_answer(request, uuid):
     try:
         ans = take_answer_from_db(uuid)
@@ -174,6 +177,7 @@ def take_answer_from_db(uuid):
     return answer.to_dict()
 
 @csrf_exempt
+@require_http_methods(["DELETE"])
 def delete_answer(response,answer_uuid):
     """ DELETE:
         Response
@@ -191,17 +195,18 @@ def delete_answer(response,answer_uuid):
         answer = models.Answer.objects.filter(uuid=UUID.UUID(answer_uuid))
     except:
         return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of answer"})
-    if len(answer) == 0:
+    if answer.count() == 0:
         return JsonResponseNotFound({"type": "error", "data": "answer with uuid not found"})
     answer.delete()
     return JsonResponse({"type": "ok"})
 
 @csrf_exempt
+@require_GET
 def count_answers(request):
     try:
         question_uuid = UUID.UUID(request.GET['question'])
     except KeyError:
-        return JsonResponseBadRequest({"type": "error","data": "you must send get parameter a 'question'"})
+        return JsonResponseBadRequest({"type": "error", "data": "you must send get parameter a 'question'"})
     except ValueError:
         return JsonResponseBadRequest({"type": "error", "data": "get parameter a 'question' must have type UUID4"})
     answers = models.Answer.objects.filter(question_uuid=question_uuid)
@@ -224,3 +229,33 @@ def count_answers_for_list_questions(request):
         return JsonResponseBadRequest({"type": "error", "data": "get parameter a 'question' must have type UUID4"})
     return JsonResponse(res)
 
+
+@csrf_exempt
+@require_GET
+def is_exist(request, auuid):
+    try:
+        auuid = UUID.UUID(auuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of answer"})
+    try:
+        models.Answer.objects.get(uuid=auuid)
+    except ObjectDoesNotExist:
+        return JsonResponseNotFound({'type': "ok", "data": "Object don't exist"})
+    return JsonResponse({'type': "ok", "data": "Object exist"})
+
+@csrf_exempt
+@require_POST
+def attach_file(request, auuid, fuuid):
+    data = {'answer': auuid, 'file': fuuid}
+    validator = forms.AttachFile(data)
+    if validator.is_valid():
+        try:
+            answer = models.Answer.objects.get(uuid=validator.cleaned_data['answer'])
+        except ObjectDoesNotExist as exp:
+            return JsonResponseNotFound({'type': 'error', "data": "answer with uuid not exists"})
+        try:
+            models.FilesForAnswer(answer=answer, file_uuid=validator.cleaned_data['file']).save(force_insert=True)
+        except Exception as exp:
+            return JsonResponseServerError({"type": "error", "data": str(exp)})
+        return JsonResponse({'type': 'ok'})
+    return JsonResponseBadRequest({'type': "error", "data": validator.errors})

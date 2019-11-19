@@ -1,13 +1,14 @@
 from django.db import models
 from uuid import uuid4, UUID
 from django.core.exceptions import ValidationError
+import datetime
 # Create your models here.
 class Question(models.Model):
     uuid = models.UUIDField(default=uuid4, primary_key=True)
-    title = models.CharField(max_length=50, unique=False)
+    title = models.CharField(max_length=100, unique=False)
     text = models.TextField()
     user = models.CharField(max_length=30, unique=False)
-    rating = models.IntegerField(default=0)#Убрать рейтинг
+    date = models.DateTimeField(default=datetime.datetime.now)
 
     def from_dict(self, d):
         try:
@@ -40,6 +41,7 @@ class Question(models.Model):
             tags_list.append(t.tag.tag)
 
         return { "uuid": self.uuid,
+                 "date": self.date,
                  "title": self.title,
                 "text": self.text,
                 "user": self.user,

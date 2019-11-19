@@ -5,6 +5,10 @@ from . import models
 class AnswerForm(forms.Form):
     text = forms.Textarea()
     question = forms.UUIDField()
-    author = forms.CharField(max_length=30)
+    user = forms.CharField(max_length=30)
     files = forms.TypedMultipleChoiceField(coerce=UUID.UUID)
 
+
+class AttachFile(forms.Form):
+    answer = forms.UUIDField()
+    file = forms.UUIDField()

@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.files.storage import FileSystemStorage
+from django.core.exceptions import ObjectDoesNotExist
 import hashlib
 import datetime
 import uuid as UUID
@@ -30,7 +31,7 @@ class FileInfo(models.Model):
         file.name = file_hash(file)
         try:
             new_file = FileContainer.objects.get(name=file.name)
-        except:
+        except ObjectDoesNotExist:
             new_file = FileContainer(name=file.name, file=file)
             new_file.save()
         self.file = new_file

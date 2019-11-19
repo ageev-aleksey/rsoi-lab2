@@ -88,7 +88,7 @@ def get_questions_page(request):
         except Exception as exp:
             log.exception("Error, get count answers of question. " + str(exp))
     elif rquestions.status_code == 203:
-        return JsonResponseNotFound({"type": "ok", "data": "answers not found"})
+        return JsonResponseNotFound({"type": "ok", "data": "questions not found"})
     return JsonResponse({"type": "ok"})
 
 
@@ -188,6 +188,7 @@ def create_question(request):
             return JsonResponse({"type": "ok", "uuid": quuid })
         else:
             return HttpResponse(conn.content, status=500)
+    return JsonResponseBadRequest({"type": "error", "data": question_data.errors})
 
 @csrf_exempt
 @require_POST
@@ -213,9 +214,27 @@ def create_answer(request, question_uuid):
 
 @csrf_exempt
 @require_POST
-#TODO если файл был загружен на сервер, но прикрепление к вопросу произошло неудачно,
-# то необходимо выполнить откат (удаление файла)
 def attach_file_question(request, quuid):
+    return attach_file(request, quuid, service_config.question_system["attache"],
+                       service_config.question_system["is_exist"], 'question')
+
+@csrf_exempt
+@require_POST
+def attach_file_answer(request, quuid, auuid):
+    try:
+       uuid.UUID(quuid)
+    except ValueError:
+        return JsonResponseBadRequest({'type': "error", "data": "incorect uuid of question"})
+    try:
+        conn = connect(service_config.question_system['is_exist'] % (quuid,), "GET")
+        if conn.status_code != 200:
+            return JsonResponseNotFound({"type": "error", "data": "question not found"})
+    except Exception as exp:
+        return JsonResponseServerError({'type': "error", "data": exp})
+    return attach_file(request, auuid, service_config.answer_system["attache"],
+                       service_config.answer_system["is_exist"], 'answer')
+
+def attach_file(request, quuid, system_attach, system_exist, system_object):
     try:
         js = json.loads(request.POST['info'])
     except:
@@ -223,21 +242,22 @@ def attach_file_question(request, quuid):
     qdata = forms.Attach(js)
     if qdata.is_valid():
         try:
-            conn = connect(service_config.question_system['is_exist'] % (quuid), "GET")
+            conn = connect(system_exist % (quuid), "GET")
             if conn.status_code == 200:
                 conn = connect(service_config.file_system["add_file"], "POST",
                                files={"file": request.FILES['file']}, data={"info": json.dumps(js)})
                 if conn.status_code == 200:
                     finfo = json.loads(conn.content)
-                    conn = connect(service_config.question_system['attache'] % (quuid, finfo['uuid']), "POST")
+                    conn = connect(system_attach % (quuid, finfo['uuid']), "POST")
                     if conn.status_code == 200:
                         return JsonResponse({"type": "ok", 'file_info': finfo})
                     else:
+                        conn = connect(service_config.file_system["delete_file"] % (finfo['uuid']), "DELETE")
                         return JsonResponseServerError({'type': "error", "data": json.loads(conn.content)})
                 else:
                     return JsonResponseServerError({'type': "error", "data": json.loads(conn.content)})
             else:
-                return JsonResponseNotFound({'type': "error", "data": "not found question this uuid"})
+                return JsonResponseNotFound({'type': "error", "data": f"not found {system_object} this uuid"})
         except Exception as exp:
             return JsonResponseServerError({"type": "error", "data": str(exp)})
 

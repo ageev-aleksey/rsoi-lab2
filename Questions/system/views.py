@@ -54,7 +54,7 @@ def get_questions(request):
         page = int(request.GET['page'])
     except:
         return JsonResponseBadRequest({"type": "error", "data": "error get parameters"})
-    data = models.Question.objects.all() #todo добавить сортировку по дате добавления вопроса.
+    data = models.Question.objects.all().order_by("date")
     if data.count() == 0:
         return JsonResponseNoContent({"type": "error", "data": "result after apply this request does not containing data"})
     paginator = Paginator(data, per_page=10)
@@ -78,7 +78,7 @@ def question(request, uuid):
         return delete_question(request, uuid)
 
 @csrf_exempt
-def get_question_detail_and_answers(request, uuid):#todo переделать, так как остутсвует ответы, ответы переехали на другой сервис
+def get_question_detail_and_answers(request, uuid):
     """GET
        Response:
            Correct:  Code 200 Ok. Body:
@@ -103,7 +103,7 @@ def get_question_detail_and_answers(request, uuid):#todo переделать, �
         return JsonResponseNotFound({"type": "error", "data": "This question Not Found"})
     return JsonResponse(question[0].detail_to_dict())
 
-#TODO сделать возможность добавление uuid файлов
+
 @require_POST
 @csrf_exempt
 def add_question2(request):
@@ -196,14 +196,14 @@ def delete_question(request, uuid):
         question = models.Question.objects.filter(uuid=UUID.UUID(uuid))
     except:
         return JsonResponseBadRequest({"type": "error", "data": "incorrect question identificator"})
-    if len(question) == 0:
+    if question.count() == 0:
         return JsonResponseNotFound({"type": "error", "data": "qustion with identificator not found"})
     question[0].delete()
     return JsonResponse({"type": "ok"})
 
 @csrf_exempt
 @require_POST
-def attache_file(request, quuid, fuuid):
+def attach_file(request, quuid, fuuid):
     data = {'question': quuid, 'file': fuuid}
     validator = forms.AttachFile(data)
     if validator.is_valid():
@@ -212,7 +212,8 @@ def attache_file(request, quuid, fuuid):
         except ObjectDoesNotExist as exp:
             return JsonResponseNotFound({'type': 'error', "data": "question with uuid not exists"})
         try:
-            models.FilesForQuestion(question=question, file_uuid=validator.cleaned_data['file']).save(force_insert=True)
+            models.FilesForQuestion(question=question,
+                                    file_uuid=validator.cleaned_data['file']).save(force_insert=True)
         except Exception as exp:
             return JsonResponseServerError({"type": "error", "data": str(exp)})
         return JsonResponse({'type': 'ok'})

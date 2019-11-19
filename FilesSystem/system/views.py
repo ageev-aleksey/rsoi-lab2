@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.core.paginator import Paginator
 from . import models
 import json
 import logging
@@ -45,8 +46,22 @@ def handle_uploaded_file(f):
             destination.write(chunk)
 
 
+@require_GET
+@csrf_exempt
+def get_all_files(request):
+    try:
+        page = request.GET['page']
+    except KeyError:
+        page = 1
+    p = Paginator(models.FileInfo.objects.all().order_by("date"), 10)
+    finfo_list = []
+    for info in p.object_list:
+        finfo_list.append(info.to_dict())
+    return JsonResponse({"type": "files_list", "files": finfo_list, "page": page, "pages": p.num_pages})
+
 
 @csrf_exempt
+@require_POST
 def file_add(request):
     """
     {
@@ -54,45 +69,70 @@ def file_add(request):
             "file_type": "jpg",
             "user": "<user_name>"
     }"""
-    if request.method == "POST":
-        file_form = forms.UploadFileForms(json.loads(request.POST['info']))
-        if file_form.is_valid():
-            file_info = models.FileInfo()
-            file_info.from_data(file_form.cleaned_data, request.FILES['file'])
-            file_info.save()
+    file_form = forms.UploadFileForms(json.loads(request.POST['info']))
+    if file_form.is_valid():
+        file_info = models.FileInfo()
+        file_info.from_data(file_form.cleaned_data, request.FILES['file'])
+        file_info.save()
+        return JsonResponse({"type": "ok", "uuid": str(file_info.uuid)})
+    return JsonResponseBadRequest({"type": "error", "data": file_form.errors})
 
-    return JsonResponse({"type": "ok", "uuid": str(file_info.uuid)})
-
-
+@require_http_methods(["GET", 'DELETE'])
+@csrf_exempt
 def file_work(request, file_uuid):
     if request.method == "GET":
         return get_file(request, file_uuid)
     elif request.method == "DELETE":
         return delete_file(request, file_uuid)
 
+
+@require_GET
+@csrf_exempt
 def get_file(request, file_uuid):
+    try:
+        file_uuid = UUID.UUID(file_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of file"})
     try:
         file_info = models.FileInfo.objects.get(uuid=file_uuid)
     except ObjectDoesNotExist:
         return JsonResponseNotFound({"type": "error", "data": "file with uuid not exists"})
     return FileResponse(file_info.file.file)
 
+@require_GET
+@csrf_exempt
 def get_file_info(request, file_uuid):
+    try:
+        file_uuid = UUID.UUID(file_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of file"})
     try:
         file_info = models.FileInfo.objects.get(uuid=file_uuid)
     except ObjectDoesNotExist:
         return JsonResponseNotFound({"type": "error", "data": "file with uuid not exists"})
     return JsonResponse(file_info.to_dict())
 
+@require_http_methods(['DELETE'])
+@csrf_exempt
 def delete_file(request, file_uuid):
     try:
+        file_uuid = UUID.UUID(file_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of file"})
+    try:
         file_info = models.FileInfo.objects.get(uuid=file_uuid)
+        file_container = file_info.file
     except ObjectDoesNotExist:
         return JsonResponseNotFound({"type": "error", "data": "file with uuid not exists"})
     file_info.delete()
-    return JsonResponse({})
+    info = models.FileInfo.objects.filter(file=file_container)
+    if info.count() == 0:
+        file_container.delete()
+    return JsonResponse({"type": "ok"})
+
 
 @require_GET
+@csrf_exempt
 def get_list_of_files_info(request):
     log = logging.getLogger("FileSystem.get_list_of_files_info")
     log.setLevel(logging.DEBUG)
@@ -106,9 +146,7 @@ def get_list_of_files_info(request):
         for l in data["uuid"]:
             u = []
             for fuuid in l:
-                print("++++++++++++")
                 print(fuuid)
-                print("++++++++++++")
                 u.append(UUID.UUID(fuuid))
             uuid_list.append(u)
     except ValueError:

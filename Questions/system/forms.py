@@ -33,7 +33,7 @@ def uuid_validator():
     return is_uuid
 
 class Question(forms.Form):
-    title = forms.CharField(max_length=50)
+    title = forms.CharField(max_length=100)
     text = forms.CharField()
     user = forms.CharField(max_length=30)
     tags = ValuesList(my_validator=text_len_validator(30), required=False)

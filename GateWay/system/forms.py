@@ -23,7 +23,7 @@ class TagsList(forms.Field):
 
 
 class Question(forms.Form):
-    title = forms.CharField(max_length=50)
+    title = forms.CharField(max_length=100)
     text = forms.CharField()
     user = forms.CharField(max_length=30)
     tags = TagsList(max_len_one_tag=30)
@@ -31,7 +31,7 @@ class Question(forms.Form):
 
 class Answer(forms.Form):
     text = forms.CharField()
-    author = forms.CharField(max_length=30)
+    user = forms.CharField(max_length=30)
     question = forms.UUIDField()
 
 class Attach(forms.Form):

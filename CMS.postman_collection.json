@@ -6,166 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "UserSystem",
-			"item": [
-				{
-					"name": "Get users list",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8000/api/v1/users/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"users",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Registration new user",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"login\": \"NewUser\",\n\t\"pass\": 5515,\n\t\"fname\": \"Алексей\",\n\t\"lname\": \"Агеев\",\n\t\"patronymic\": \"Владимирович\",\n\t\"birth\": \"21.08.1997\",\n\t\"avatar\": \"47a666d1-f503-4c13-bd13-689f06dd83a5\"\n\t\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/singup/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"singup",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Registration new user2",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"login\": \"King\",\n\t\"pass\": \"65461654aef6d4as6fs6d5f4Z68465465ds4f654dS\",\n\t\"fname\": \"Владимир\",\n\t\"lname\": \"Путин\",\n\t\"patronymic\": \"Владимирович\"\n\t\"birth\": \"14.06.1946\",\n\t\"avatar\": \"c5a43904-1bcc-442b-a203-eec38c8224bc\"\n\t\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/singup/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"singup",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Check Permission",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"token\": \"BSomV2RRQmKiGCoibKgC.5ebdd2d022b83fba5fa8aa17084239cf1199c26355f1add0d7655f688618ce97\",\n\t\"service\": \"8d458c42-9bbd-4949-a93e-34b3a02d4545\",\n\t\"object\": \"cd60875d-5cb3-4d0e-92a6-61544017f80b\",\n\t\"permission\": \"read\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/check_permission/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"check_permission",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Singin",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"login\": \"super-admin\",\n\t\"pass\": \"123\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8000/api/v1/singin/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"singin",
-								""
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
 			"name": "Questions",
 			"item": [
 				{
@@ -174,7 +14,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8001/api/v1/questions/1",
+							"raw": "http://127.0.0.1:8001/api/v1/questions?page=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -186,8 +26,13 @@
 							"path": [
 								"api",
 								"v1",
-								"questions",
-								"1"
+								"questions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
 							]
 						}
 					},
@@ -529,7 +374,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/form/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
+							"raw": "http://127.0.0.1:8003/api/v1/files/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -537,13 +382,38 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8003",
 							"path": [
-								"form",
+								"api",
+								"v1",
+								"files",
+								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All files",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8003/api/v1/file/all/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8003",
+							"path": [
 								"api",
 								"v1",
 								"file",
-								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								"all",
 								""
 							]
 						}
@@ -727,7 +597,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/answers/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"raw": "http://127.0.0.1:8002/api/v1/answers/812ea7a3-a06b-46b5-9091-4db44a654941/files/7a4ac22d-6928-4d8b-a2fa-74d0293ad4d6/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -735,13 +605,14 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8002",
 							"path": [
 								"api",
 								"v1",
 								"answers",
-								"8cf85328-fcf9-411a-a4e0-f501373349f4",
+								"812ea7a3-a06b-46b5-9091-4db44a654941",
 								"files",
+								"7a4ac22d-6928-4d8b-a2fa-74d0293ad4d6",
 								""
 							]
 						}
@@ -769,6 +640,33 @@
 								"answers",
 								"8cf85328-fcf9-411a-a4e0-f501373349f4",
 								"files",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is Exist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8002/api/v1/answers/812ea7a3-a06b-46b5-9091-4db44a654941/exist/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8002",
+							"path": [
+								"api",
+								"v1",
+								"answers",
+								"812ea7a3-a06b-46b5-9091-4db44a654941",
+								"exist",
 								""
 							]
 						}
@@ -815,7 +713,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/",
+							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -826,7 +724,7 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"d4ca5555-4278-4868-ad59-747e19bec098",
+								"a2883873-3a93-489b-bf44-d3ca211c8e14",
 								""
 							]
 						}
@@ -847,7 +745,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n                \"title\": \"Решите эту задачу\",\r\n                \"text\": \"Старинная математическая задача, в которой спрашивалось, как можно пройти по всем семи мостам Кёнигсберга, не проходя ни по одному из них дважды\",\r\n                \"user\": \"Алексей\",\r\n                \"tags\": [\"Графы\"]\r\n}",
+							"raw": "{\r\n                \"title\": \"Как защитить от спама формы landing page без капчи?\",\r\n                \"text\": \"Есть обычный лендинг-пейдж без cms (на html / css +обработчик формы на php). На него начал идти спам. Как избавится от него? Ставил скрытое поле для спам ботов, но оно не помогает. Какие еще есть способы защиты без капчи?\",\r\n                \"user\": \"neytan\",\r\n                \"tags\": [\"php\", \"javascript\", \"jquery\", \"спам\", \"фильтрация спама\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -855,7 +753,20 @@
 							}
 						},
 						"url": {
-							"raw": "",
+							"raw": "http://127.0.0.1:8000/questions/add/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"add",
+								""
+							],
 							"query": [
 								{
 									"key": "",
@@ -881,7 +792,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Пишите одну - максимально отшлифованную игру, а все остальные - нет и указываете: что нужно ещё доделать до идеала и почему Вы это не сделали: т.е. именно честно так всё и перечисляете. Сначала указываете причину создания нешлифованного проекта:'Проект, показывающий моё %умение/skill%...'. И потом, пишите пункты (в readme.md), которые Вы бы сделали до идеала.Обязательно, после этих пунктов, приводите ссылку на проект с максимально отшлифованной игрой (чтобы могли сравнить слова с делом).\",\r\n    \"author\": \"xmoonlight\"\r\n}",
+							"raw": "{\r\n    \"text\": \"Пишите одну - максимально отшлифованную игру, а все остальные - нет и указываете: что нужно ещё доделать до идеала и почему Вы это не сделали: т.е. именно честно так всё и перечисляете. Сначала указываете причину создания нешлифованного проекта:'Проект, показывающий моё %умение/skill%...'. И потом, пишите пункты (в readme.md), которые Вы бы сделали до идеала.Обязательно, после этих пунктов, приводите ссылку на проект с максимально отшлифованной игрой (чтобы могли сравнить слова с делом).\",\r\n    \"user\": \"xmoonlight\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -889,7 +800,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/answers/add/",
+							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/answers/add/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -900,7 +811,7 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"d4ca5555-4278-4868-ad59-747e19bec098",
+								"a2883873-3a93-489b-bf44-d3ca211c8e14",
 								"answers",
 								"add",
 								""
@@ -915,7 +826,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/d4ca5555-4278-4868-ad59-747e19bec098/files/add",
+							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/files/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -926,9 +837,9 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"d4ca5555-4278-4868-ad59-747e19bec098",
+								"a2883873-3a93-489b-bf44-d3ca211c8e14",
 								"files",
-								"add"
+								""
 							]
 						}
 					},
@@ -939,8 +850,39 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "info",
+									"value": "{\"file_name\": \"Учебник.djvu\"}",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
-							"raw": ""
+							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/answers/721ed804-32a7-41e4-a723-fd4f817c436e/files/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"a2883873-3a93-489b-bf44-d3ca211c8e14",
+								"answers",
+								"721ed804-32a7-41e4-a723-fd4f817c436e",
+								"files",
+								""
+							]
 						}
 					},
 					"response": []
