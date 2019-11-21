@@ -232,5 +232,22 @@ def is_exist(request, quuid):
         return JsonResponseNotFound({'type': "ok", "data": "Object don't exist"})
     return JsonResponse({'type': "ok", "data": "Object exist"})
 
+@csrf_exempt
+@require_DELETE
+def try_delete(reuest, fuuid):
+    try:
+        fuuid = UUID.UUID(fuuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect file uuid"})
+    file = models.FilesForQuestion.objects.filter(file_uuid=fuuid)
+    if file.count() == 0:
+        return JsonResponseNotFound({"type": "error", "data": "not found question which belong this file"})
+    file[0].delete()
+    return JsonResponse({"type": "ok"})
+
+
+
+
+
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
 #TODO для 4 лабы использовать redis

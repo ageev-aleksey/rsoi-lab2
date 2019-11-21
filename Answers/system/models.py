@@ -2,13 +2,29 @@ from django.db import models
 import datetime
 import uuid as UUID
 
-# Create your models here.
+class AnswerController(models.Manager):
+    def get_files(self, answer_uuid):
+        answer = Answer.objects.get(uuid=answer_uuid)
+        files = super().get_queryset().filter(answer=answer)
+        fl = []
+        for f in files:
+            fl.append(f.file_uuid)
+        return fl
+    def check_answers_qestion_belong(self, uuid_answers, uuid_question):
+        for uuid in uuid_answers:
+            if Answer.objects.get(uuid = uuid_answers).question_uuid != uuid_question:
+                return False
+        return True
+
 class Answer(models.Model):
     uuid = models.UUIDField(default=UUID.uuid4, unique=True)
     question_uuid = models.UUIDField(null=False, unique=False)
     text = models.TextField()
     user = models.CharField(max_length=30, unique=False)
     date = models.DateField(default=datetime.datetime.now)
+
+    objects = models.Manager()
+    controller = AnswerController()
     def to_dict(self):
         files = FilesForAnswer.objects.filter(answer=self.id)
         flist = []
@@ -35,3 +51,6 @@ class FilesForAnswer(models.Model):
         unique_together = (('answer', 'file_uuid'),)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     file_uuid = models.UUIDField(null=False, editable=True)
+
+    objects = models.Manager()
+    controller = AnswerController()

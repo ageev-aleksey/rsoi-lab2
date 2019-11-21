@@ -201,6 +201,36 @@ def delete_answer(response,answer_uuid):
     return JsonResponse({"type": "ok"})
 
 @csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_answer_and_return_files(response,answer_uuid):
+    try:
+        UUID.UUID(answer_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of answer"})
+    files = models.FilesForAnswer.controller.get_files(answer_uuid)
+    res = delete_answer(response,answer_uuid)
+    if res.status_code == 200:
+        return JsonResponse({"type": "ok", "files": res})
+    else:
+        return res
+
+def check_belong_answers(request, question_uuid):
+    try:
+        question_uuid = UUID.UUID(question_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect question uuid"})
+    try:
+        data = forms.uuid_list(json.loads(request.body))
+    except Exception as exp:
+        return JsonResponseBadRequest({"type": "error", "data": str(exp)})
+    if data.is_valid():
+        if models.Answer.controller.check_answers_qestion_belong(data.cleaned_data, question_uuid):
+            return JsonResponse({"type": "ok", "data": "answers belong this question"})
+        else:
+            return JsonResponseNotFound({"type": "ok", "data": "answers don't belong this question"})
+    return JsonResponseBadRequest({'type': "error", "data:": data.errors})
+
+@csrf_exempt
 @require_GET
 def count_answers(request):
     try:
@@ -259,3 +289,17 @@ def attach_file(request, auuid, fuuid):
             return JsonResponseServerError({"type": "error", "data": str(exp)})
         return JsonResponse({'type': 'ok'})
     return JsonResponseBadRequest({'type': "error", "data": validator.errors})
+
+
+@csrf_exempt
+@require_DELETE
+def try_delete_file(reuest, fuuid):
+    try:
+        fuuid = UUID.UUID(fuuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect file uuid"})
+    file = models.FilesForAnswer.objects.filter(file_uuid=fuuid)
+    if file.count() == 0:
+        return JsonResponseNotFound({"type": "error", "data": "not found answer which belong this file"})
+    file[0].delete()
+    return JsonResponse({"type": "ok"})

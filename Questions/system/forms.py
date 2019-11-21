@@ -32,6 +32,11 @@ def uuid_validator():
             raise ValidationError(_("string must have a uuid format"))
     return is_uuid
 
+class uuid_list(forms.Form):
+    uuid= ValuesList(my_validator=uuid_validator())
+
+
+
 class Question(forms.Form):
     title = forms.CharField(max_length=100)
     text = forms.CharField()

@@ -56,7 +56,7 @@ def get_all_files(request):
     p = Paginator(models.FileInfo.objects.all().order_by("date"), 10)
     finfo_list = []
     for info in p.object_list:
-        finfo_list.append(info.to_dict())
+        finfo_list.append(info.to_dict_and_path())
     return JsonResponse({"type": "files_list", "files": finfo_list, "page": page, "pages": p.num_pages})
 
 

@@ -1,6 +1,7 @@
 from django.db import models
-from django.core.files.storage import FileSystemStorage
+from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
+import os
 import hashlib
 import datetime
 import uuid as UUID
@@ -12,6 +13,15 @@ def create_file_path(instance, file_name):
 class FileContainer (models.Model):
     name = models.CharField(max_length=32, primary_key=True)
     file = models.FileField(upload_to="users_files/")
+
+
+@receiver(models.signals.post_delete, sender=FileContainer)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    if instance.file:
+        if os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+
+
 
 
 def file_hash(file):
@@ -43,3 +53,7 @@ class FileInfo(models.Model):
             "file_size": self.file.file.size,
             "date": self.date,
         }
+    def to_dict_and_path(self):
+        d = self.to_dict()
+        d['path'] = self.file.file.name
+        return d

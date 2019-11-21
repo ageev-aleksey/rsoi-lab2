@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
-from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.http import JsonResponse, HttpResponse, FileResponse, HttpRequest
 from . import forms
 import logging
 import requests
@@ -19,6 +19,16 @@ class JsonResponseCreated(JsonResponse):
     status_code = 201
 class JsonResponseServerError(JsonResponse):
     status_code = 500
+
+def download_file(url, file_name = "temporary"):
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(file_name, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+    return file_name
+
 
 def file_unpack(file):
     return {'file', file}
@@ -264,3 +274,86 @@ def attach_file(request, quuid, system_attach, system_exist, system_object):
 
 
     return JsonResponseBadRequest({"type": "error", "data": qdata.errors})
+
+@csrf_exempt
+@require_http_methods(['GET', 'DELETE'])
+def file_worker(request):
+    if request.method == "GET":
+        return download_file_controller(request)
+    else:
+        return delete_file_controller(request)
+
+
+@csrf_exempt
+@require_GET
+def download_file_controller(request, fuuid):
+    try:
+        uuid.UUID(fuuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of file"})
+    try:
+        fname = download_file(service_config.file_system['download'] % (fuuid,))
+    except Exception as exp:
+        return JsonResponseServerError({"type": "error", "data": "internal server error"})
+
+    return FileResponse(open(fname, "br"))
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_file_controller(request, try_delete_files_in_services = True):
+    try:
+        data = forms.uuid_list(json.loads(request.body))
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "request mast be containing json object"})
+    if data.is_valid():
+        for fuuid in data.cleaned_data['uuid']:
+            try:
+                if try_delete_files_in_services:
+                    conn = connect(service_config.question_system['try_delete_file'] % (fuuid,), "DELETE")
+                    if conn.status_code == 404:#файл не принадлежит ни одному вопросу
+                        conn = connect(service_config.answer_system['try_delete_file'] % (fuuid,), "DELETE")
+                        if conn.status_code != 200: #либо файл не принадлежит ни одному ответу, либо ошибка на срвисе
+                            return JsonResponseServerError({"type": "error", "data": "impossible delete file"})
+                conn = connect(service_config.file_system['delete_file'] % (fuuid,), "DELETE")
+                if conn.status_code != 200:
+                    return JsonResponseServerError({'type': "error", "data": "impossible delete file"})
+            except Exception as exp:
+                return JsonResponseServerError({"type": "error", "data": str(exp)})
+        return JsonResponse({'type': "ok", "data": "file was be removed"})
+    else:
+        return JsonResponseBadRequest({"type": "error", "data": data.errors})
+
+
+
+@require_http_methods(["DELETE"])
+@csrf_exempt
+def delete_answers(request, question_uuid):
+    try:
+        data = forms.uuid_list(json.loads(request.body))
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "body of request must containing a json object"})
+    try:
+        uuid.UUID(question_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect question uuid"})
+    try:
+        conn = connect(service_config.answer_system['check_belong_answers'] % (question_uuid,),
+                       "GET", data=request.body)
+    except Exception as exp:
+        return JsonResponseServerError({'type': "error", "data": str(exp)})
+    if conn.status_code == 404:
+        return JsonResponseBadRequest({"type": "error", "data": "this answers don't belong this question"})
+    if data.is_valid():
+        for auuid in data.cleaned_data['uuid']:
+            try:
+                conn = connect(service_config.answer_system['delete_and_return_files'] % (auuid), "DELETE")
+                if conn.status_code == 200:
+                    request_for_del_files = HttpRequest()
+                    request_for_del_files.body = conn.content
+                    request_for_del_files.method = "DELETE"
+                    return delete_file_controller(request_for_del_files, False)
+                else:
+                    return JsonResponseServerError({"type": "error", "data": "error of delete files"})
+            except Exception as exp:
+                return JsonResponseServerError({"type": "error", "data": str(exp)})
+    return JsonResponseBadRequest({"type": "error", "data": data.errors})
