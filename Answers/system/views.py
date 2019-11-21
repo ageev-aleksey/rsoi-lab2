@@ -202,7 +202,7 @@ def delete_answer(response,answer_uuid):
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
-def delete_answer_and_return_files(response,answer_uuid):
+def delete_answer_and_return_files(response, answer_uuid):
     try:
         UUID.UUID(answer_uuid)
     except ValueError:
@@ -210,7 +210,7 @@ def delete_answer_and_return_files(response,answer_uuid):
     files = models.FilesForAnswer.controller.get_files(answer_uuid)
     res = delete_answer(response,answer_uuid)
     if res.status_code == 200:
-        return JsonResponse({"type": "ok", "files": res})
+        return JsonResponse({"type": "ok", "files": files})
     else:
         return res
 
@@ -224,7 +224,7 @@ def check_belong_answers(request, question_uuid):
     except Exception as exp:
         return JsonResponseBadRequest({"type": "error", "data": str(exp)})
     if data.is_valid():
-        if models.Answer.controller.check_answers_qestion_belong(data.cleaned_data, question_uuid):
+        if models.Answer.controller.check_answers_qestion_belong(data.cleaned_data['uuid'], question_uuid):
             return JsonResponse({"type": "ok", "data": "answers belong this question"})
         else:
             return JsonResponseNotFound({"type": "ok", "data": "answers don't belong this question"})

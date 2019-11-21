@@ -12,7 +12,7 @@ class AnswerController(models.Manager):
         return fl
     def check_answers_qestion_belong(self, uuid_answers, uuid_question):
         for uuid in uuid_answers:
-            if Answer.objects.get(uuid = uuid_answers).question_uuid != uuid_question:
+            if Answer.objects.get(uuid=uuid).question_uuid != uuid_question:
                 return False
         return True
 

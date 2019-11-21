@@ -349,7 +349,7 @@ def delete_answers(request, question_uuid):
                 conn = connect(service_config.answer_system['delete_and_return_files'] % (auuid), "DELETE")
                 if conn.status_code == 200:
                     request_for_del_files = HttpRequest()
-                    request_for_del_files.body = conn.content
+                    request_for_del_files._body = conn.content
                     request_for_del_files.method = "DELETE"
                     return delete_file_controller(request_for_del_files, False)
                 else:
