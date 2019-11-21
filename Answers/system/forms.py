@@ -31,10 +31,13 @@ class uuid_list(forms.Form):
 
 
 class AnswerForm(forms.Form):
-    text = forms.Textarea()
+    text = forms.CharField()
     question = forms.UUIDField()
     user = forms.CharField(max_length=30)
     files = forms.TypedMultipleChoiceField(coerce=UUID.UUID)
+
+
+
 
 
 class AttachFile(forms.Form):

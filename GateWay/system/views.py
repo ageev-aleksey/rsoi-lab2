@@ -101,6 +101,13 @@ def get_questions_page(request):
         return JsonResponseNotFound({"type": "ok", "data": "questions not found"})
     return JsonResponse({"type": "ok"})
 
+@csrf_exempt
+@require_http_methods(["GET", "DELETE"])
+def question_worker(request, question_uuid):
+    if request.method == "GET":
+        return get_question(request, question_uuid)
+    else:
+        return delete_question(request, question_uuid)
 
 def get_question(request, question_uuid):
     """Страница долджна содержать:
@@ -349,7 +356,7 @@ def delete_answers(request, question_uuid):
                 conn = connect(service_config.answer_system['delete_and_return_files'] % (auuid), "DELETE")
                 if conn.status_code == 200:
                     request_for_del_files = HttpRequest()
-                    request_for_del_files._body = conn.content
+                    request_for_del_files._body = json.dumps({"uuid": json.loads(conn.content)["files"]})
                     request_for_del_files.method = "DELETE"
                     return delete_file_controller(request_for_del_files, False)
                 else:
@@ -357,3 +364,38 @@ def delete_answers(request, question_uuid):
             except Exception as exp:
                 return JsonResponseServerError({"type": "error", "data": str(exp)})
     return JsonResponseBadRequest({"type": "error", "data": data.errors})
+
+
+def delete_question(request, question_uuid):
+    try:
+        uuid.UUID(question_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of answer"})
+    conn = connect(service_config.question_system["is_exist"] % (question_uuid,), "GET")
+    if conn.status_code == 200:
+        conn = connect(service_config.answer_system['get_answers'] % (question_uuid,), "GET")
+        if conn.status_code == 200:
+            if len(json.loads(conn.content)["uuid"]) != 0:
+                request_for_del_answers = HttpRequest()
+                request_for_del_answers._body = conn.content
+                request_for_del_answers.method = "DELETE"
+                response = delete_answers(request_for_del_answers, question_uuid)
+                if response.status_code != 200:
+                    return JsonResponseServerError({"type": "error", "data": "answers of question delete error!"})
+        conn = connect(service_config.question_system['delete_and_return_files'] % (question_uuid,), "DELETE")
+        if conn.status_code == 200:
+            try:
+                files_list = json.loads(conn.content)["uuid"]
+                if len(files_list) != 0:
+                    request_for_del_files = HttpRequest()
+                    request_for_del_files._body = json.dumps({"uuid": files_list})
+                    request_for_del_files.method = "DELETE"
+                    return delete_file_controller(request_for_del_files, False)
+                else:
+                    return JsonResponse({"type": "ok", "data": "question was be removed"})
+            except Exception as exp:
+                return JsonResponseServerError({"type": "error", "data": str(exp)})
+        else:
+            return JsonResponseServerError({"type": "error", "data": "question delete error!"})
+    else:
+        return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})

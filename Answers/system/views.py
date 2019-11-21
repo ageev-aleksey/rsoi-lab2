@@ -110,14 +110,17 @@ def add_answer_test(request):
     return JsonResponse({'ok': "ok"})
 
 @csrf_exempt
-def get_or_del_answer(request, uuid):
+@require_http_methods(["GET", "DELETE", "PATCH"])
+def answers_worker(request, uuid):
     if request.method == "GET":
         return get_answer(request, uuid)
     if request.method == "DELETE":
         return delete_answer(request, uuid)
-    return JsonResponseMethodNotAllowed({"type": "error",
-                                         "data": "this url path not allowed method is " + request.method},
-                                        ["GET", "DELETE"])
+    if request.method == "PATCH":
+        return update_answer(request, uuid);
+
+def update_answer(request, uuid):
+    pass
 
 @csrf_exempt
 @require_GET
@@ -303,3 +306,16 @@ def try_delete_file(reuest, fuuid):
         return JsonResponseNotFound({"type": "error", "data": "not found answer which belong this file"})
     file[0].delete()
     return JsonResponse({"type": "ok"})
+
+@csrf_exempt
+@require_GET
+def get_answers_of_question(request, question_uuid):
+    try:
+        question_uuid = UUID.UUID(question_uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect uuid of question"})
+    answers = models.Answer.objects.filter(question_uuid=question_uuid)
+    uuid_list = []
+    for answ in answers:
+        uuid_list.append(answ.uuid)
+    return JsonResponse({"type": "answers_uuid", "uuid": uuid_list})

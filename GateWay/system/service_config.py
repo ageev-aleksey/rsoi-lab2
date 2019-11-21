@@ -5,6 +5,7 @@ question_system = {
     "is_exist": "http://127.0.0.1:8001/api/v1/questions/%s/exist/",
     "attache": "http://127.0.0.1:8001/api/v1/questions/%s/files/%s/",
     "try_delete_file": "http://127.0.0.1:8001/api/v1/files/%s/",
+    "delete_and_return_files": "http://127.0.0.1:8001/api/v1/questions/%s/get_files/",
                 }
 
 answer_system = {
@@ -15,7 +16,8 @@ answer_system = {
     "attache": "http://127.0.0.1:8002/api/v1/answers/%s/files/%s/",
     "try_delete_file": "http://127.0.0.1:8002/api/v1/files/%s/",
     "delete_and_return_files": "http://127.0.0.1:8002/api/v1/answers/%s/get_files/",
-    'check_belong_answers': "http://127.0.0.1:8002/api/v1/answers/question_belong/%s/"
+    'check_belong_answers': "http://127.0.0.1:8002/api/v1/answers/question_belong/%s/",
+    "get_answers": "http://127.0.0.1:8002/api/v1/answers/of_question/%s/"
                 }
 
 file_system = {

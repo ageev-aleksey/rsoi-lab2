@@ -7,5 +7,6 @@ urlpatterns = [
     path('api/v1/questions/<str:uuid>/', views.question),
     path('api/v1/questions/<str:quuid>/files/<str:fuuid>/', views.attach_file),
     path('api/v1/questions/<str:quuid>/exist/', views.is_exist),
-    path("api/v1/files/<str:fuuid>/", views.try_delete)
+    path("api/v1/files/<str:fuuid>/", views.try_delete),
+    path("api/v1/questions/<str:quuid>/get_files/", views.delete_and_return_files),
 ]

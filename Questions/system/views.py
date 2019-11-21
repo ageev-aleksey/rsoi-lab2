@@ -246,8 +246,23 @@ def try_delete(reuest, fuuid):
     return JsonResponse({"type": "ok"})
 
 
-
-
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_and_return_files(request, quuid):
+    try:
+        quuid = UUID.UUID(quuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "incorrect question uuid"})
+    try:
+        question = models.Question.objects.get(uuid=quuid)
+    except ObjectDoesNotExist:
+        return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})
+    files = models.FilesForQuestion.objects.filter(question=question)
+    flist = []
+    for f in files:
+        flist.append(str(f.file_uuid))
+    question.delete()
+    return JsonResponse({"type": "files_list", "uuid": flist})
 
 #TODO Запрос на добавление ответа к вопросу, завершается без ошибок, но запрос дитального описания вопроса не выводит добавленный ответ
 #TODO для 4 лабы использовать redis
