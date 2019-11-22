@@ -31,8 +31,8 @@ class Answer(models.Model):
         for f in files:
             flist.append(str(f.file_uuid))
         return {
-            'uuid': self.uuid,
-            'question': self.question_uuid,
+            'uuid': str(self.uuid),
+            'question': str(self.question_uuid),
             'text': self.text,
             'user': self.user,
             'files': flist,

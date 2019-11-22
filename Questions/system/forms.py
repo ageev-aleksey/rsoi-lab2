@@ -44,6 +44,10 @@ class Question(forms.Form):
     tags = ValuesList(my_validator=text_len_validator(30), required=False)
     files = ValuesList(my_validator=uuid_validator(), required=False)
 
+class QuestionUpdate(forms.Form):#TODO как редактировать ответ, если редактируется одно поле, то надо ли отправлять остальные поля со старым значением?
+    title = forms.CharField(max_length=100)
+    text = forms.CharField(required=False)
+    tags = ValuesList(my_validator=text_len_validator(30), required=False)
 
 class Answer(forms.Form):
     text = forms.Textarea()

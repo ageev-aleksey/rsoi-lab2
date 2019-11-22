@@ -111,7 +111,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8001/api/v1/questions/ebfb8eb6-9ca4-4a92-8708-2b5ea25bedc6/",
+							"raw": "http://127.0.0.1:8001/api/v1/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -124,38 +124,8 @@
 								"api",
 								"v1",
 								"questions",
-								"ebfb8eb6-9ca4-4a92-8708-2b5ea25bedc6",
+								"a2883873-3a93-489b-bf44-d3ca211c8e14",
 								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete answer",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/answers/ca1f5147-beca-48ff-a018-55d32b7de144",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"v1",
-								"questions",
-								"8cf85328-fcf9-411a-a4e0-f501373349f4",
-								"answers",
-								"ca1f5147-beca-48ff-a018-55d32b7de144"
 							]
 						}
 					},
@@ -194,7 +164,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/questions/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"raw": "http://127.0.0.1:8001/api/v1/files/5ccf8644-e236-4dcf-8828-6ff3cd74d036/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -202,13 +172,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8001",
 							"path": [
 								"api",
 								"v1",
-								"questions",
-								"8cf85328-fcf9-411a-a4e0-f501373349f4",
 								"files",
+								"5ccf8644-e236-4dcf-8828-6ff3cd74d036",
 								""
 							]
 						}
@@ -347,7 +316,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/file/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/info/",
+							"raw": "http://127.0.0.1:8003/api/v1/files/5ccf8644-e236-4dcf-8828-6ff3cd74d036/info/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -355,12 +324,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8003",
 							"path": [
 								"api",
 								"v1",
-								"file",
-								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								"files",
+								"5ccf8644-e236-4dcf-8828-6ff3cd74d036",
 								"info",
 								""
 							]
@@ -374,7 +343,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8003/api/v1/files/ea2d8ebb-075f-4327-a7cc-b82fa4d185af/",
+							"raw": "http://127.0.0.1:8003/api/v1/files/15de3a2a-d4a7-4cb5-907d-194c58251877/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -387,7 +356,7 @@
 								"api",
 								"v1",
 								"files",
-								"ea2d8ebb-075f-4327-a7cc-b82fa4d185af",
+								"15de3a2a-d4a7-4cb5-907d-194c58251877",
 								""
 							]
 						}
@@ -400,7 +369,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8003/api/v1/file/all/",
+							"raw": "http://127.0.0.1:8003/api/v1/files/all/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -412,7 +381,7 @@
 							"path": [
 								"api",
 								"v1",
-								"file",
+								"files",
 								"all",
 								""
 							]
@@ -440,7 +409,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"11111111111111111111111111111111111111111111111111111111111111111111111111111111\",\r\n    \"author\": \"11111\",\r\n    \"question\": \"2fcc80f1-f579-4268-b6c5-43c27797eb03\",\r\n    \"files\": [\"2fcc80f1-f579-4268-b6c5-43c27797eb03\"]\r\n}",
+							"raw": "{\r\n    \"text\": \"11111111111111111111111111111111111111111111111111111111111111111111111111111111\",\r\n    \"user\": \"11111\",\r\n    \"question\": \"2fcc80f1-f579-4268-b6c5-43c27797eb03\",\r\n    \"files\": [\"2fcc80f1-f579-4268-b6c5-43c27797eb03\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -540,7 +509,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/answers/1284e985-d02f-40b5-8d5b-38895b4e4b03/",
+							"raw": "http://127.0.0.1:8002/api/v1/answers/721ed804-32a7-41e4-a723-fd4f817c436e/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -548,12 +517,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8002",
 							"path": [
 								"api",
 								"v1",
 								"answers",
-								"1284e985-d02f-40b5-8d5b-38895b4e4b03",
+								"721ed804-32a7-41e4-a723-fd4f817c436e",
 								""
 							]
 						}
@@ -625,7 +594,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/answers/8cf85328-fcf9-411a-a4e0-f501373349f4/files/",
+							"raw": "http://127.0.0.1:8002/api/v1/files/2151f8d6-039a-4262-8e38-765625cf3d7a/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -633,13 +602,12 @@
 								"0",
 								"1"
 							],
-							"port": "8000",
+							"port": "8002",
 							"path": [
 								"api",
 								"v1",
-								"answers",
-								"8cf85328-fcf9-411a-a4e0-f501373349f4",
 								"files",
+								"2151f8d6-039a-4262-8e38-765625cf3d7a",
 								""
 							]
 						}
@@ -713,7 +681,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/",
+							"raw": "http://127.0.0.1:8000/questions/bb961be4-ff2a-4ce2-a4f8-bcb6c9ca8d89/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -724,7 +692,31 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"a2883873-3a93-489b-bf44-d3ca211c8e14",
+								"bb961be4-ff2a-4ce2-a4f8-bcb6c9ca8d89",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "download file",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/files/d6572ddb-905a-48d4-b10d-aff5490288d4/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"files",
+								"d6572ddb-905a-48d4-b10d-aff5490288d4",
 								""
 							]
 						}
@@ -800,7 +792,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/answers/add/",
+							"raw": "http://127.0.0.1:8000/questions/ec3979ce-9748-43e4-95b0-b7b9c15543da/answers/add/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -811,7 +803,7 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"a2883873-3a93-489b-bf44-d3ca211c8e14",
+								"ec3979ce-9748-43e4-95b0-b7b9c15543da",
 								"answers",
 								"add",
 								""
@@ -825,8 +817,23 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "info",
+									"value": "{\"file_name\": \"type-gtest\"}",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Aleksey/Desktop/src/gtest-typed-test.cc"
+								}
+							]
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/files/",
+							"raw": "http://127.0.0.1:8000/questions/ec3979ce-9748-43e4-95b0-b7b9c15543da/files/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -837,7 +844,7 @@
 							"port": "8000",
 							"path": [
 								"questions",
-								"a2883873-3a93-489b-bf44-d3ca211c8e14",
+								"ec3979ce-9748-43e4-95b0-b7b9c15543da",
 								"files",
 								""
 							]
@@ -855,18 +862,112 @@
 							"formdata": [
 								{
 									"key": "file",
-									"value": "",
-									"type": "text"
+									"type": "file",
+									"src": "/C:/Users/Aleksey/Desktop/Prolog/test.pl"
 								},
 								{
 									"key": "info",
-									"value": "{\"file_name\": \"Учебник.djvu\"}",
+									"value": "{\"file_name\": \"prolog\"}",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/answers/721ed804-32a7-41e4-a723-fd4f817c436e/files/",
+							"raw": "http://127.0.0.1:8000/questions/ec3979ce-9748-43e4-95b0-b7b9c15543da/answers/176d1c91-d0e0-462b-93eb-651feeeef88f/files/?",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"questions",
+								"ec3979ce-9748-43e4-95b0-b7b9c15543da",
+								"answers",
+								"176d1c91-d0e0-462b-93eb-651feeeef88f",
+								"files",
+								""
+							],
+							"query": [
+								{
+									"key": "info",
+									"value": "{\"file_name\": \"coll2\"}",
+									"disabled": true
+								},
+								{
+									"key": "file",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete file",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"uuid\": [ \"0b0ef30d-780c-4bdb-b6e9-0a2c80210eaf\", \"0feb3f43-4384-4ef3-a464-ca15871e940f\", \"1e96aca4-b763-4c2a-a771-b17d4d805223\", \"359a3d56-8797-4634-b301-ef15ac1cad00\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/files/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"files",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete answers",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"uuid\": [\"a443c47d-013d-4de5-8559-14da37747429\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/questions/a2883873-3a93-489b-bf44-d3ca211c8e14/answers/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -879,8 +980,6 @@
 								"questions",
 								"a2883873-3a93-489b-bf44-d3ca211c8e14",
 								"answers",
-								"721ed804-32a7-41e4-a723-fd4f817c436e",
-								"files",
 								""
 							]
 						}
@@ -888,12 +987,12 @@
 					"response": []
 				},
 				{
-					"name": "download file",
+					"name": "delete question",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/files/uuid_file",
+							"raw": "http://127.0.0.1:8000/questions/ec3979ce-9748-43e4-95b0-b7b9c15543da/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -903,8 +1002,9 @@
 							],
 							"port": "8000",
 							"path": [
-								"files",
-								"uuid_file"
+								"questions",
+								"ec3979ce-9748-43e4-95b0-b7b9c15543da",
+								""
 							]
 						}
 					},

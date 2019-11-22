@@ -214,6 +214,9 @@ def create_answer(request, question_uuid):
         data = json.loads(request.body)
     except:
         return JsonResponseBadRequest({"error": "body of request must be containing a json object"})
+    conn = connect(service_config.question_system['is_exist'] % (question_uuid,), "GET")
+    if conn.status_code != 200:
+        return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})
     data["question"] = question_uuid
     adata = forms.Answer(data)
     if adata.is_valid():
@@ -313,6 +316,8 @@ def delete_file_controller(request, try_delete_files_in_services = True):
     except ValueError:
         return JsonResponseBadRequest({"type": "error", "data": "request mast be containing json object"})
     if data.is_valid():
+        error_free_files = []
+        error_dont_delete = []
         for fuuid in data.cleaned_data['uuid']:
             try:
                 if try_delete_files_in_services:
@@ -320,13 +325,17 @@ def delete_file_controller(request, try_delete_files_in_services = True):
                     if conn.status_code == 404:#файл не принадлежит ни одному вопросу
                         conn = connect(service_config.answer_system['try_delete_file'] % (fuuid,), "DELETE")
                         if conn.status_code != 200: #либо файл не принадлежит ни одному ответу, либо ошибка на срвисе
-                            return JsonResponseServerError({"type": "error", "data": "impossible delete file"})
+                            error_free_files.append(fuuid)
                 conn = connect(service_config.file_system['delete_file'] % (fuuid,), "DELETE")
                 if conn.status_code != 200:
-                    return JsonResponseServerError({'type': "error", "data": "impossible delete file"})
+                    error_dont_delete.append(fuuid)
             except Exception as exp:
                 return JsonResponseServerError({"type": "error", "data": str(exp)})
-        return JsonResponse({'type': "ok", "data": "file was be removed"})
+        if (len(error_dont_delete) == 0) and (len(error_free_files) == 0):
+            return JsonResponse({'type': "ok", "data": "file was be removed"})
+        else:
+            JsonResponse({'type': "ok", "data": "file was be removed", "free":  error_free_files,
+                          "not_del": error_dont_delete}, status=207)
     else:
         return JsonResponseBadRequest({"type": "error", "data": data.errors})
 
@@ -351,6 +360,8 @@ def delete_answers(request, question_uuid):
     if conn.status_code == 404:
         return JsonResponseBadRequest({"type": "error", "data": "this answers don't belong this question"})
     if data.is_valid():
+        error_del_files_for_answer = []
+        error_del_answer = []
         for auuid in data.cleaned_data['uuid']:
             try:
                 conn = connect(service_config.answer_system['delete_and_return_files'] % (auuid), "DELETE")
@@ -358,11 +369,17 @@ def delete_answers(request, question_uuid):
                     request_for_del_files = HttpRequest()
                     request_for_del_files._body = json.dumps({"uuid": json.loads(conn.content)["files"]})
                     request_for_del_files.method = "DELETE"
-                    return delete_file_controller(request_for_del_files, False)
+                    response = delete_file_controller(request_for_del_files, False)
+                    if response.status_code != 200:
+                        error_del_files_for_answer.appned(auuid)
                 else:
-                    return JsonResponseServerError({"type": "error", "data": "error of delete files"})
+                    error_del_answer.append(auuid)
             except Exception as exp:
                 return JsonResponseServerError({"type": "error", "data": str(exp)})
+        if len(error_del_files_for_answer) != 0 or len(error_del_answer) != 0:
+            return JsonResponse({"type": "partial removal", 'error_del_files_of_answer': error_del_files_for_answer,
+                                 "error_del_answer": error_del_answer}, status=207)
+        return JsonResponse({"type": "ok", "data": "answers was be removed"})
     return JsonResponseBadRequest({"type": "error", "data": data.errors})
 
 

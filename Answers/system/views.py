@@ -44,7 +44,6 @@ def required_http_methods_json(allowed_request):
     return decorator
 
 
-# Create your views here.
 @require_POST
 @csrf_exempt
 def add_answer(request):
@@ -110,17 +109,30 @@ def add_answer_test(request):
     return JsonResponse({'ok': "ok"})
 
 @csrf_exempt
-@require_http_methods(["GET", "DELETE", "PATCH"])
+@require_http_methods(["GET", "DELETE"])
 def answers_worker(request, uuid):
     if request.method == "GET":
         return get_answer(request, uuid)
     if request.method == "DELETE":
         return delete_answer(request, uuid)
-    if request.method == "PATCH":
-        return update_answer(request, uuid);
 
+'''
 def update_answer(request, uuid):
-    pass
+    try:
+        uuid = UUID.UUID(uuid)
+    except ValueError:
+        return JsonResponseBadRequest({"type": "error", "data": "inocrrect uuid of answer"})
+    try:
+        answer = models.Answer.objects.get(uuid=uuid)
+        answer.text = json.loads(request.body)['text']
+        answer.save()
+        return JsonResponse({"type": "ok", "data": "answer update"})
+    except ObjectDoesNotExist:
+        return JsonResponseNotFound({"type": "error", "data": "answer with uuid not found"})
+    except KeyError as exp:
+        return JsonResponseBadRequest({"type": "error", "data": str(exp)})
+'''
+
 
 @csrf_exempt
 @require_GET
@@ -138,7 +150,7 @@ def get_answers_page(request):
     try:
          paginator = Paginator(models.Answer.objects.filter(question_uuid=request.GET["question"]).order_by('date'), 3)
          try:
-             if page > paginator.num_pages:
+             if page > paginator.num_pages or page < 0:
                  return JsonResponseNotFound({"type": "error", "data": "this page for answer not exists"})
          except KeyError:
             return JsonResponseBadRequest({"type": "error", "data": "when accessing the resource, you must pass "
@@ -175,7 +187,7 @@ def take_answer_from_db(uuid):
     try:
         answer = models.Answer.objects.get(uuid=uuid)
     except ObjectDoesNotExist:
-        raise ObjectDoesNotExist("answer with uuid " + uuid + " not found")
+        raise ObjectDoesNotExist("answer with uuid " + str(uuid) + " not found")
         #return JsonResponseNotFound({"type": "error", "data": "answer with uuid " + uuid + " not found"})
     return answer.to_dict()
 
@@ -246,7 +258,6 @@ def count_answers(request):
     return JsonResponse({"type": "ok", "count": answers.count()})
 
 @csrf_exempt
-@require_GET
 def count_answers_for_list_questions(request):
     try:
         data = json.loads(request.body)
@@ -264,7 +275,6 @@ def count_answers_for_list_questions(request):
 
 
 @csrf_exempt
-@require_GET
 def is_exist(request, auuid):
     try:
         auuid = UUID.UUID(auuid)

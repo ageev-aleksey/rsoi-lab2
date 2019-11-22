@@ -39,7 +39,6 @@ class AnswerForm(forms.Form):
 
 
 
-
 class AttachFile(forms.Form):
     answer = forms.UUIDField()
     file = forms.UUIDField()
