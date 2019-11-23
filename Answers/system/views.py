@@ -59,6 +59,7 @@ def add_answer(request):
     try:
         data = json.loads(request.body)
     except:
+
         return JsonResponseBadRequest({"type": "error", "data": "You must send body in json format"})
    # проверка всех uuid
     try:

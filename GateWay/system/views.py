@@ -3,7 +3,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.http import JsonResponse, HttpResponse, FileResponse, HttpRequest
 from . import forms
-import logging
 import requests
 import json
 import uuid
@@ -20,6 +19,14 @@ class JsonResponseCreated(JsonResponse):
 class JsonResponseServerError(JsonResponse):
     status_code = 500
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def download_file(url, file_name = "temporary"):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
@@ -33,9 +40,8 @@ def download_file(url, file_name = "temporary"):
 def file_unpack(file):
     return {'file', file}
 #data = None, params = None, files=None
-def connect(service_path,method, timeout=5, **kwargs):
-    log = logging.getLogger('GetWay.connect')
-    log.setLevel(logging.DEBUG)
+def connect(service_path,method, timeout=5, data=None, **kwargs):
+    log = service_config.logging.getLogger("connection")
     if method == "POST":
         con =  requests.post
     elif method == "GET":
@@ -48,31 +54,34 @@ def connect(service_path,method, timeout=5, **kwargs):
     while(counter != 2):
         try:
             #params=params, data=data, files=files
-            r = con(service_path, timeout=timeout, **kwargs)
+            r = con(service_path, timeout=timeout, data=data, **kwargs)
             break
         except requests.exceptions.Timeout as exp:
-            log.exception("connection timeout")
+            log.error("Try connect to: %s; %d", service_path, counter)
             counter = counter+1
         except ConnectionError as exp:
             raise exp
     if counter == 2:
+        log.error("impossible connection to %s", service_path)
         raise ConnectionError("Request time out")
     return r
 
 @csrf_exempt
 @require_GET
 def get_questions_page(request):
-    log = logging.getLogger("GetWay.get_questions_page")
-    log.setLevel(logging.DEBUG)
+    log = service_config.logging.getLogger("get_questions_page")
     try:
         page = int(request.GET['page'])
     except KeyError:
-        return JsonResponseBadRequest({"type": "error", "data": "request don't have a query parameter 'get'"})
+        page = 1
     except ValueError:
+        log.error("clinet with ip %s send incorrect query parametr 'get'", get_client_ip(request))
         return JsonResponseBadRequest({"type": "error", "data": "query parameter 'get' mast have type int"})
     try:
+        log.info("GET: list of question from question service")
         rquestions = connect(service_config.question_system["questions_list"], "GET", params={"page": page})
-    except (ConnectionError, ValueError):
+    except (ConnectionError, ValueError) as exp:
+        log.error("impossible get list of questions: (%s)", str(exp))
         return JsonResponseServerError({"type": "error", "data": "Unable to get a list of questions"})
     if rquestions.status_code == 200:
         try:
@@ -80,9 +89,9 @@ def get_questions_page(request):
             uuid_list = {"questions": []}
             for el in data["questions"]:
                 uuid_list["questions"].append(el['uuid'])
+            log.info("GET: number answers of questions list")
             rcount_answers = connect(service_config.answer_system["count_answers_question"],
-                                     "GET", data=json.dumps(uuid_list))
-            print(rcount_answers.status_code)
+                                     "GET", data=json.dumps(uuid_list).encode("UTF-8"))
             if rcount_answers.status_code == 200:
                 count = rcount_answers.json()['count']
                 res = {"type": "questions_paginate", "page": page, "pages": data["pages"],
@@ -91,15 +100,14 @@ def get_questions_page(request):
                     res["questions"].append(data["questions"][q])
                     res["questions"][-1]["answers"] = count[q]
                 return JsonResponse(res)
-
-
-
-
+            else:
+                log.error("impossible get number of question")
         except Exception as exp:
             log.exception("Error, get count answers of question. " + str(exp))
     elif rquestions.status_code == 203:
+        log.info("questions not found")
         return JsonResponseNotFound({"type": "ok", "data": "questions not found"})
-    return JsonResponse({"type": "ok"})
+    return JsonResponse({"type": "error"})
 
 @csrf_exempt
 @require_http_methods(["GET", "DELETE"])
@@ -126,11 +134,11 @@ def get_question(request, question_uuid):
                     -Название
                     -Тип
     """
-    log = logging.getLogger("gateway.get_question")
-    log.setLevel(logging.DEBUG)
+    log = service_config.logging.getLogger("get_questions")
     try:
        uuid.UUID(question_uuid)
     except ValueError:
+        log.error("user with ip %s send incorrect question uuid", get_client_ip(request))
         return JsonResponseBadRequest({"type": "error", "data": "for choose concrete answer you must using a uuid"})
     try:
         page = request.GET['page']
@@ -138,14 +146,21 @@ def get_question(request, question_uuid):
         page = 1
 
     try:
+        log.info("GET full describe question for uuid: %s", question_uuid)
         rquestion = connect(service_config.question_system['question'] + f"{question_uuid}/", "GET")
         if rquestion.status_code == 200:
             qdata = rquestion.json()
         elif rquestion.status_code == 404:
+            log.error("question for uuid %s not found", question_uuid)
             return JsonResponseNotFound({'type': "error", "data": "question with uuid not found"})
+    except ConnectionError as exp:
+        log.error("Service question is unavailable")
+        return JsonResponseServerError({"type": "error", "data": "unable to get question page"})
     except Exception as exp:
+        log.error("unknown error")
         return JsonResponseServerError({"type": "error", "data": "unable to get question page"})
     try:
+        log.info("GET: all answers of question %s", question_uuid)
         ranswer = connect(service_config.answer_system['answers_for_question'], "GET",
                           params={"page": page, "question": question_uuid})
         if ranswer.status_code == 200:
@@ -165,6 +180,7 @@ def get_question(request, question_uuid):
 
     try:
         file_data = None
+        log.info("GET: files list")
         rfile = connect(service_config.file_system['list_of_files'] , "GET", data=json.dumps({"uuid": files_list}))
         if rfile.status_code == 200:
             file_data = rfile.json()["files_info"]
@@ -189,33 +205,42 @@ def get_question(request, question_uuid):
 @csrf_exempt
 @require_POST
 def create_question(request):
+    log = service_config.logging.getLogger("create_question")
     try:
         data = json.loads(request.body)
     except ValueError:
+        log.error("client with ip %s sended incorrect body request", get_client_ip(request))
         return JsonResponseBadRequest({"error": "body of request must be containing a json object"})
     question_data = forms.Question(data)
     if question_data.is_valid():
+        log.info('POST: Add questions')
         conn = connect(service_config.question_system['add_question'], "POST",
                        data=json.dumps(question_data.cleaned_data))
         try:
             quuid = json.loads(conn.content)["uuid"]
         except:
+            log.error("server: %s, send error uuid of question", service_config.question_system['add_question'])
             return JsonResponseServerError({"type": "error", "data": "internal server error"})
         if conn.status_code == 201:
             return JsonResponse({"type": "ok", "uuid": quuid })
         else:
+            log.error("was sanding error question on servise: %s", service_config.question_system['add_question'])
             return HttpResponse(conn.content, status=500)
     return JsonResponseBadRequest({"type": "error", "data": question_data.errors})
 
 @csrf_exempt
 @require_POST
 def create_answer(request, question_uuid):
+    log = service_config.logging.getLogger("create_answer")
     try:
         data = json.loads(request.body)
     except:
+        log.error("client with ip %s senden incorrect body of request", get_client_ip(request))
         return JsonResponseBadRequest({"error": "body of request must be containing a json object"})
+    log.info("GET: check for the existence of a question")
     conn = connect(service_config.question_system['is_exist'] % (question_uuid,), "GET")
     if conn.status_code != 200:
+        log.error("question with uuid %s not found", question_uuid)
         return JsonResponseNotFound({"type": "error", "data": "question with uuid not found"})
     data["question"] = question_uuid
     adata = forms.Answer(data)
@@ -223,12 +248,15 @@ def create_answer(request, question_uuid):
         try:
             adata.cleaned_data["question"] = str(adata.cleaned_data["question"])
             adata.cleaned_data["files"] = []
+            log.info("POST: sending request on create new answer")
             conn = connect(service_config.answer_system['add_answer'], "POST",
                            data=json.dumps(adata.cleaned_data))
             ans_data = json.loads(conn.content)
         except Exception as exp:
+            log.error("internal server error")
             return JsonResponseServerError({"type": "error", "data": "internal server error"})
         return JsonResponse(ans_data)
+    log.error("client sanded incorrect data for create new answer")
     return JsonResponseBadRequest({"type": "error", "data": adata.errors})
 
 
