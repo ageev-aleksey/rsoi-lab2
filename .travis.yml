@@ -1,8 +1,7 @@
-  language: python
-  install:
+language: python
+script:
     - pip install django
     - pip install requests
-  script:
     - cd Answers 
     - python manage.py test
     - cd ../Questions
