@@ -1,12 +1,14 @@
 import logging
-logging.basicConfig(format = "[%(ascitime)s] %(name)s: %(message)s;")
 question_system_dst = "127.0.0.1:8001"
 answer_systme_dst = "127.0.0.1:8002"
 file_system_dst = "127.0.0.1:8003"
 
+logging.info("RUN GateWay. Waiting for required services. question_system: %s; answer_system: %s; file_system: %s",
+             question_system_dst, answer_systme_dst, file_system_dst)
+
 question_system = {
     "questions_list": f"http://{question_system_dst}/api/v1/questions/",
-    "question": f"http://{question_system_dst}/api/v1/questions/",
+    "question": f"http://{question_system_dst}/api/v1/questions/%s",
     "add_question": f"http://{question_system_dst}/api/v1/questions/add/",
     "is_exist": f"http://{question_system_dst}/api/v1/questions/%s/exist/",
     "attache": f"http://{question_system_dst}/api/v1/questions/%s/files/%s/",

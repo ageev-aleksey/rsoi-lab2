@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+import logging
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GateWay.settings')
@@ -18,4 +18,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+	logging.basicConfig(format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s;\n", filename="GateWay.log",
+		filemode="w", level=logging.DEBUG)
+	main()
