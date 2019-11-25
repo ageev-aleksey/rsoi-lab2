@@ -46,7 +46,7 @@ def handle_uploaded_file(f):
             destination.write(chunk)
 
 
-@require_GET
+
 @csrf_exempt
 def get_all_files(request):
     try:
@@ -131,7 +131,7 @@ def delete_file(request, file_uuid):
     return JsonResponse({"type": "ok"})
 
 
-@require_GET
+
 @csrf_exempt
 def get_list_of_files_info(request):
     log = logging.getLogger("FileSystem.get_list_of_files_info")
