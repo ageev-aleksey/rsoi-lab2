@@ -40,8 +40,8 @@ class Question(models.Model):
         for t in qtags:
             tags_list.append(t.tag.tag)
 
-        return { "uuid": self.uuid,
-                 "date": self.date,
+        return { "uuid": str(self.uuid),
+                 "date": str(self.date),
                  "title": self.title,
                 "text": self.text,
                 "user": self.user,

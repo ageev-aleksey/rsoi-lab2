@@ -169,3 +169,28 @@ class view_test(TestCase):
         self.assertEquals(response.status_code, 200)
         file = models.FilesForAnswer.objects.filter(file_uuid=fuuid)
         self.assertEquals(file.count(), 1)
+
+    def test_delete_answer_and_return_file(self):
+        self.answer.save()
+        file = models.FilesForAnswer(answer=self.answer, file_uuid=uuid.uuid4())
+        file.save()
+        c = Client()
+        response = c.delete(f'/api/v1/answers/{str(self.answer.uuid)}/get_files/')
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(json.loads(response.content), {"type": "ok", "files": [str(file.file_uuid)]})
+
+    def test_check_belong_answers(self):
+        quuid = uuid.uuid4()
+        self.answer.question_uuid = quuid
+        self.answer.save()
+        answer1 = models.Answer(user='bob', text='super_text', question_uuid=quuid)
+        answer1.save()
+        answer2 = models.Answer(user='bob', text='super_text', question_uuid=uuid.uuid4())
+        answer2.save()
+        c = Client()
+        response = c.post(f'/api/v1/answers/question_belong/{str(quuid)}/',
+                        data=json.dumps({"uuid": [str(answer1.uuid), str(self.answer.uuid),str(answer2.uuid)]}),
+                         content_type='application/json')
+        print(response.content)
+        self.assertEquals(response.status_code, 404)
+        self.assertEquals(json.loads(response.content), {"type": "ok", "data": "answers don't belong this question"})

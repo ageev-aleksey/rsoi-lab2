@@ -98,6 +98,7 @@ def add_answer(request):
         log.exeption(str(exp))
         return JsonResponseBadRequest({"type": "error", "data": str(exp)})
 
+'''X
 @require_POST
 @csrf_exempt
 def add_answer_test(request):
@@ -117,6 +118,7 @@ def add_answer_test(request):
         print(data.cleaned_data)
     print(data.errors)
     return JsonResponse({'ok': "ok"})
+'''
 
 @csrf_exempt
 @require_http_methods(["GET", "DELETE"])
@@ -125,7 +127,6 @@ def answers_worker(request, uuid):
         return get_answer(request, uuid)
     if request.method == "DELETE":
         return delete_answer(request, uuid)
-
 '''
 def update_answer(request, uuid):
     try:
@@ -271,6 +272,9 @@ def check_belong_answers(request, question_uuid):
         return JsonResponseBadRequest({"type": "error", "data": "incorrect question uuid"})
     try:
         data = forms.uuid_list(json.loads(request.body))
+    except json.decoder.JSONDecodeError:
+        log.error('request body containing invalid json object')
+        return JsonResponseBadRequest({"type": "error", "data": 'body of rquest must containing a json object'})
     except Exception as exp:
         log.exception(str(exp))
         return JsonResponseBadRequest({"type": "error", "data": str(exp)})
@@ -279,7 +283,7 @@ def check_belong_answers(request, question_uuid):
             log.info("answers  belong  question %s", str(data.cleaned_data['uuid']), question_uuid)
             return JsonResponse({"type": "ok", "data": "answers belong this question"})
         else:
-            log.error("answers %s don't belong question %s", )
+            log.error("answers %s don't belong question %s", data.cleaned_data['uuid'], question_uuid)
             return JsonResponseNotFound({"type": "ok", "data": "answers don't belong this question"})
     return JsonResponseBadRequest({'type': "error", "data:": data.errors})
 

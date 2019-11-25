@@ -1,2 +1,2 @@
-coverage run --source='system\views.py,system\models.py' manage.py test
+coverage run --source='system\views.py, system\models.py' manage.py test
 coverage html

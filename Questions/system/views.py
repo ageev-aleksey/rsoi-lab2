@@ -111,7 +111,7 @@ def get_question_detail_and_answers(request, uuid):
     log.info("question %s find", str(uuid))
     return JsonResponse(question[0].detail_to_dict())
 
-
+'''
 @require_POST
 @csrf_exempt
 def add_question2(request):
@@ -161,7 +161,7 @@ def add_question2(request):
         models.TagsForQuestions(question=question, tag=tag).save()
     log.info("question %s created", str(question.uuid))
     return JsonResponseCreated({"type": "ok", "uuid": question.uuid})
-
+'''
 @require_POST
 @csrf_exempt
 def add_question(request):
@@ -280,7 +280,7 @@ def try_delete(reuest, fuuid):
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_and_return_files(request, quuid):
-    log = logging("delete_and_return_files")
+    log = logging.getLogger("delete_and_return_files")
     log.info("began delete question %s with returning list of files", quuid)
     try:
         quuid = UUID.UUID(quuid)
